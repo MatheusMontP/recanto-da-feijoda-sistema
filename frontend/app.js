@@ -167,7 +167,7 @@ const App = {
             
             // Definição da URL do Backend (Altere essa variável quando colocar o Python no Render)
             // Exemplo: const API_RENDER_URL = "https://seu-servidor-no.onrender.com";
-            const API_RENDER_URL = ""; 
+            const API_RENDER_URL = "https://recanto-da-feijoda-sistema.onrender.com"; 
             
             const isLocalhost = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost" || !window.location.hostname;
             const baseUrl = (isLocalhost || !API_RENDER_URL) ? "" : API_RENDER_URL;
