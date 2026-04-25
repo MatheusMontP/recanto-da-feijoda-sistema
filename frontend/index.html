@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Recanto da Feijoada — Sistema de Roteirização de Entregas">
+    <title>Recanto da Feijoada · Roteirizador</title>
+
+    <!-- Fonts (matching the main site) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Vue 3 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+
+    <style>
+        /* ══════════════════════════════════════════
+           DESIGN TOKENS — Matching recantodafeijoada.netlify.app
+           ══════════════════════════════════════════ */
+        :root {
+            --brown:       #2C1810;
+            --brown-mid:   #3D2314;
+            --brown-light: #5a3a2a;
+            --orange:      #E07020;
+            --orange-dark: #C05A10;
+            --gold:        #F0A030;
+            --cream:       #FDF6EC;
+            --white:       #FFFFFF;
+            --gray:        #6B6B6B;
+            --gray-light:  #F5F0E8;
+            --red:         #D32F2F;
+
+            --font-serif: 'Playfair Display', Georgia, serif;
+            --font-sans:  'DM Sans', system-ui, sans-serif;
+
+            --ease: cubic-bezier(0.4, 0, 0.2, 1);
+            --shadow-sm: 0 2px 8px rgba(44,24,16,0.08);
+            --shadow-md: 0 8px 24px rgba(44,24,16,0.12);
+            --shadow-lg: 0 20px 48px rgba(44,24,16,0.18);
+
+            --radius-sm: 10px;
+            --radius-md: 18px;
+            --radius-lg: 28px;
+            --radius-xl: 40px;
+        }
+
+        /* ── Dark Mode Override ── */
+        .dark {
+            --brown:       #F5F0E8;
+            --brown-mid:   #e8e0d6;
+            --brown-light: #c4b5a5;
+            --orange:      #E8823A;
+            --orange-dark: #D06A20;
+            --gold:        #F0A030;
+            --cream:       #111111;
+            --white:       #1a1a1a;
+            --gray:        #9a9a9a;
+            --gray-light:  #222222;
+            --red:         #ef5350;
+
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.25);
+            --shadow-md: 0 8px 24px rgba(0,0,0,0.35);
+            --shadow-lg: 0 20px 48px rgba(0,0,0,0.45);
+        }
+        .dark .navbar {
+            background: rgba(17, 17, 17, 0.97);
+        }
+        .dark .text-input {
+            background: #1a1a1a; border-color: #333; color: #e8e0d6;
+        }
+        .dark .text-input::placeholder { color: #555; }
+        .dark .counter { border-color: #333; background: #1a1a1a; }
+        .dark .counter-btn { color: #e8e0d6; }
+        .dark .counter-val { color: #e8e0d6; }
+        .dark .order-item-num { background: #e8e0d6; color: #111; }
+        .dark .block-badge { background: #2a2a2a; color: #888; }
+        .dark .toggle-pills { background: #2a2a2a; }
+        .dark .toggle-pill.active { background: #e8e0d6; color: #111; }
+        .dark .stop-content { background: #1e1e1e; }
+        .dark .stop-row:hover .stop-content { background: rgba(232,130,58,0.08); }
+        .dark .stop-dot { border-color: #555; background: #1a1a1a; }
+        .dark .stop-line { background: #333; }
+        .dark .origin-dot { box-shadow: 0 0 0 4px rgba(232,130,58,0.15); }
+        .dark .origin-line-down { background: linear-gradient(var(--orange), #333); }
+        .dark .stop-qty-box { background: #1a1a1a; border-color: rgba(232,130,58,0.25); }
+        .dark .error-banner { background: #2a1515; border-color: rgba(239,83,80,0.3); }
+        .dark .error-banner p { color: #ef9a9a; }
+        .dark .results-empty { border-color: #333; }
+        .dark .footer { border-color: #222; }
+
+        /* Dark toggle button */
+        .dark-toggle {
+            width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            background: rgba(255,255,255,0.1); border: none; cursor: pointer;
+            transition: background 0.2s var(--ease), transform 0.2s var(--ease);
+            margin-left: 0.5rem;
+        }
+        .dark-toggle:hover { background: rgba(255,255,255,0.18); transform: scale(1.1); }
+        .dark-toggle i { width: 18px; height: 18px; color: var(--gold); }
+
+        /* ── Reset ── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { overflow-x: hidden; width: 100%; }
+        html { scroll-behavior: smooth; font-size: 16px; }
+        body {
+            font-family: var(--font-sans);
+            background: var(--cream);
+            color: var(--brown);
+            line-height: 1.65;
+            font-size: 15px;
+            letter-spacing: 0.01em;
+            min-height: 100vh;
+        }
+        img { display: block; max-width: 100%; }
+        button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+        /* Number input arrows hide */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #c4b5a5; border-radius: 3px; }
+
+        /* ── Layout ── */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+
+        /* ══ NAVBAR ══ */
+        .navbar {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(44, 24, 16, 0.97);
+            backdrop-filter: blur(12px);
+            box-shadow: var(--shadow-md);
+        }
+        .nav-inner {
+            height: 66px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .nav-brand {
+            display: flex; align-items: center; gap: 0.75rem;
+        }
+        .nav-logo-img {
+            width: 46px; height: 46px; border-radius: 50%; object-fit: cover;
+            border: 2px solid rgba(255,255,255,0.15);
+        }
+        .nav-title {
+            font-family: var(--font-serif);
+            font-size: 1.3rem; font-weight: 700; color: var(--white);
+        }
+        .nav-title span { color: var(--gold); font-weight: 600; }
+        .nav-subtitle { font-size: 0.7rem; color: rgba(255,255,255,0.5); letter-spacing: 0.15em; text-transform: uppercase; }
+        .nav-origin {
+            display: flex; align-items: center; gap: 0.6rem;
+            background: rgba(255,255,255,0.08); border-radius: var(--radius-xl);
+            padding: 0.4rem 1rem 0.4rem 0.5rem;
+        }
+        .nav-origin-img {
+            width: 34px; height: 34px; border-radius: 50%; object-fit: cover;
+            border: 1.5px solid rgba(255,255,255,0.1);
+        }
+        .nav-origin-label { font-size: 0.65rem; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600; }
+        .nav-origin-text { font-size: 0.82rem; color: rgba(255,255,255,0.85); font-weight: 500; }
+
+        /* ══ MAIN GRID ══ */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 420px 1fr;
+            gap: 2.5rem;
+            padding: 2rem 0 4rem;
+            align-items: start;
+        }
+
+        /* ══ LEFT SIDEBAR ══ */
+        .sidebar { display: flex; flex-direction: column; gap: 1.5rem; }
+
+        /* Card */
+        .card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 1.75rem;
+            box-shadow: var(--shadow-sm);
+        }
+        .card-title {
+            font-family: var(--font-serif);
+            font-size: 1.3rem; font-weight: 700;
+            display: flex; align-items: center; gap: 0.6rem;
+            margin-bottom: 1.25rem;
+        }
+        .card-title i { color: var(--orange); width: 22px; height: 22px; }
+
+        /* Input */
+        .field-label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--gray); margin-bottom: 0.4rem; }
+        .text-input {
+            width: 100%; padding: 0.85rem 1rem;
+            border: 1.5px solid #e0d8d0; border-radius: var(--radius-sm);
+            font-family: var(--font-sans); font-size: 0.95rem;
+            color: var(--brown); background: var(--white);
+            transition: border-color 0.15s var(--ease), box-shadow 0.15s var(--ease);
+        }
+        .text-input::placeholder { color: #b5a898; }
+        .text-input:focus { outline: none; border-color: var(--orange); box-shadow: 0 0 0 3px rgba(224,112,32,0.12); }
+
+        /* Counter */
+        .counter { display: flex; align-items: center; border: 1.5px solid #e0d8d0; border-radius: var(--radius-xl); overflow: hidden; background: var(--white); }
+        .counter-btn {
+            width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; font-weight: 700; color: var(--brown);
+            transition: background 0.15s var(--ease), color 0.15s var(--ease);
+        }
+        .counter-btn:hover { background: var(--orange); color: var(--white); }
+        .counter-btn:active { transform: scale(0.9); }
+        .counter-val {
+            min-width: 40px; text-align: center;
+            font-size: 1.05rem; font-weight: 700; color: var(--brown); user-select: none;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+            padding: 0.8rem 1.5rem; border-radius: var(--radius-xl);
+            font-size: 0.92rem; font-weight: 600; letter-spacing: 0.02em;
+            transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease), background 0.15s var(--ease);
+            cursor: pointer; border: 2px solid transparent; white-space: nowrap;
+        }
+        .btn:active { transform: scale(0.96) !important; }
+
+        .btn-primary { background: var(--orange); color: var(--white); border-color: var(--orange); }
+        .btn-primary:hover { background: var(--orange-dark); border-color: var(--orange-dark); box-shadow: 0 8px 20px rgba(224,112,32,0.3); transform: translateY(-1px); }
+        .btn-primary:disabled { background: #d4ccc2; color: #9a9189; border-color: #d4ccc2; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        .btn-generate {
+            width: 100%; padding: 1rem; font-size: 1rem; font-weight: 700;
+            background: var(--brown); color: var(--white); border-color: var(--brown);
+            border-radius: var(--radius-md);
+        }
+        .btn-generate:hover { background: var(--brown-mid); box-shadow: var(--shadow-md); transform: translateY(-1px); }
+        .btn-generate:disabled { background: #d4ccc2; color: #9a9189; border-color: #d4ccc2; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* ── Block list ── */
+        .block-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+        .block-badge { background: var(--gray-light); font-size: 0.78rem; font-weight: 600; padding: 0.3rem 0.75rem; border-radius: var(--radius-xl); color: var(--gray); }
+        .block-clear { font-size: 0.8rem; font-weight: 500; color: var(--gray); transition: color 0.15s; }
+        .block-clear:hover { color: var(--red); }
+
+        .order-item {
+            display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;
+            padding: 0.9rem 1rem; border-radius: var(--radius-sm);
+            background: var(--gray-light); margin-bottom: 0.5rem;
+            transition: background 0.15s var(--ease);
+            animation: springIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+        @keyframes springIn {
+            from { opacity: 0; transform: translateX(12px) scale(0.96); }
+            to   { opacity: 1; transform: translateX(0) scale(1); }
+        }
+        .order-item-num {
+            width: 28px; height: 28px; border-radius: 50%;
+            background: var(--brown); color: var(--white); display: flex; align-items: center; justify-content: center;
+            font-size: 0.75rem; font-weight: 700; flex-shrink: 0;
+        }
+        .order-item-info { flex: 1; min-width: 0; }
+        .order-item-addr { font-size: 0.88rem; font-weight: 500; color: var(--brown); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .order-item-qty { font-size: 0.75rem; color: var(--orange); font-weight: 600; }
+        .order-action-btn {
+            width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+            border-radius: 6px; color: #b5a898; transition: all 0.15s var(--ease); background: transparent;
+        }
+        .order-action-btn i { width: 14px; height: 14px; }
+        .order-action-btn:hover { color: var(--orange); background: rgba(224,112,32,0.08); }
+        .order-action-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .order-action-btn:disabled:hover { color: #b5a898; background: transparent; }
+        .order-action-btn-danger:hover { color: var(--red); background: rgba(211,47,47,0.08); }
+
+        .btn-export-gmaps { border-color: #4285F4; color: #4285F4; }
+        .btn-export-gmaps:hover { background: #4285F4; color: var(--white); box-shadow: 0 4px 12px rgba(66,133,244,0.3); }
+        .btn-export-waze { border-color: #33CCFF; color: #33CCFF; }
+        .btn-export-waze:hover { background: #33CCFF; color: #000; box-shadow: 0 4px 12px rgba(51,204,255,0.3); }
+
+        .empty-state { text-align: center; padding: 2rem 1rem; color: var(--gray); }
+        .empty-state i { width: 36px; height: 36px; color: #d4ccc2; margin-bottom: 0.75rem; }
+        .empty-state p { font-size: 0.88rem; }
+
+        /* ══ RIGHT PANEL ══ */
+        .results-panel { display: flex; flex-direction: column; gap: 1.5rem; }
+
+        /* Summary Stats */
+        .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+        .stat-card {
+            background: var(--white); border-radius: var(--radius-md); padding: 1.5rem; text-align: center;
+            box-shadow: var(--shadow-sm);
+        }
+        .stat-card i { color: var(--orange); margin-bottom: 0.5rem; }
+        .stat-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--gray); font-weight: 600; margin-bottom: 0.25rem; }
+        .stat-value { font-family: var(--font-serif); font-size: 2rem; font-weight: 700; color: var(--brown); }
+        .stat-unit { font-size: 0.85rem; font-weight: 500; color: var(--orange); }
+
+        /* Toggle */
+        .toggle-bar {
+            background: var(--white); border-radius: var(--radius-md); padding: 1.25rem 1.5rem;
+            display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+            box-shadow: var(--shadow-sm); position: relative; overflow: hidden;
+        }
+        .toggle-bar::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: linear-gradient(to bottom, var(--orange), var(--gold)); }
+        .toggle-info h3 { font-family: var(--font-serif); font-size: 1.1rem; font-weight: 700; color: var(--brown); }
+        .toggle-info p { font-size: 0.78rem; color: var(--gray); margin-top: 0.15rem; }
+        .toggle-pills { display: flex; background: var(--gray-light); border-radius: var(--radius-xl); padding: 3px; }
+        .toggle-pill {
+            padding: 0.5rem 1.1rem; border-radius: var(--radius-xl);
+            font-size: 0.8rem; font-weight: 600; color: var(--gray);
+            transition: all 0.2s var(--ease); display: flex; align-items: center; gap: 0.4rem;
+        }
+        .toggle-pill.active { background: var(--brown); color: var(--white); box-shadow: var(--shadow-sm); }
+        .toggle-pill.active-opt { background: var(--orange); color: var(--white); box-shadow: 0 4px 12px rgba(224,112,32,0.3); }
+        .toggle-pill i { width: 14px; height: 14px; }
+
+        /* Route Timeline */
+        .timeline-card {
+            background: var(--white); border-radius: var(--radius-lg); padding: 2rem;
+            box-shadow: var(--shadow-sm); overflow-y: auto; max-height: 520px;
+        }
+        .origin-row { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1.5rem; }
+        .origin-dot {
+            width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+            background: var(--orange); display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 0 4px rgba(224,112,32,0.15);
+        }
+        .origin-dot i { color: var(--white); width: 18px; height: 18px; }
+        .origin-eyebrow { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--orange); font-weight: 700; }
+        .origin-name { font-family: var(--font-serif); font-size: 1.05rem; font-weight: 700; color: var(--brown); }
+        .origin-sub { font-size: 0.8rem; color: var(--gray); }
+        .origin-line-down { width: 2px; height: 20px; background: linear-gradient(var(--orange), #e0d8d0); margin: 0.5rem auto 0; border-radius: 2px; }
+
+        .stop-row { display: flex; align-items: flex-start; gap: 1rem; padding-bottom: 1.25rem; position: relative; }
+        .stop-track {
+            display: flex; flex-direction: column; align-items: center; flex-shrink: 0; width: 36px;
+        }
+        .stop-dot {
+            width: 12px; height: 12px; border-radius: 50%; border: 2.5px solid #d4ccc2; background: var(--white);
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .stop-row:hover .stop-dot { border-color: var(--orange); background: rgba(224,112,32,0.1); }
+        .stop-line { flex: 1; width: 2px; background: #e8e0d6; margin-top: 4px; border-radius: 2px; min-height: 20px; }
+        .stop-content {
+            flex: 1; background: var(--gray-light); padding: 1rem 1.25rem; border-radius: var(--radius-sm);
+            display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;
+            transition: background 0.2s;
+        }
+        .stop-row:hover .stop-content { background: rgba(224,112,32,0.06); }
+        .stop-badge { font-size: 0.68rem; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.2rem; }
+        .stop-addr { font-size: 0.92rem; font-weight: 500; color: var(--brown); }
+        .stop-qty-box {
+            background: var(--white); border: 1.5px solid rgba(224,112,32,0.2); border-radius: var(--radius-sm);
+            padding: 0.4rem 0.75rem; text-align: center; flex-shrink: 0;
+        }
+        .stop-qty-num { font-family: var(--font-serif); font-size: 1.3rem; font-weight: 700; color: var(--orange); line-height: 1; }
+        .stop-qty-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray); font-weight: 600; }
+
+        /* ── Export Bar ── */
+        .export-bar {
+            background: var(--brown); border-radius: var(--radius-md); padding: 1.25rem 1.5rem;
+            display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+            box-shadow: var(--shadow-md); flex-wrap: wrap;
+        }
+        .export-title { color: var(--white); font-family: var(--font-serif); font-size: 1rem; font-weight: 700; }
+        .export-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .btn-export {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            padding: 0.55rem 1rem; border-radius: var(--radius-xl);
+            font-size: 0.8rem; font-weight: 600;
+            border: 1.5px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.85);
+            background: rgba(255,255,255,0.06);
+            transition: all 0.15s var(--ease);
+        }
+        .btn-export:hover { background: rgba(255,255,255,0.12); color: var(--white); border-color: rgba(255,255,255,0.35); transform: translateY(-1px); }
+        .btn-export i { width: 14px; height: 14px; }
+        .btn-export-whatsapp { border-color: #25D366; color: #25D366; }
+        .btn-export-whatsapp:hover { background: #25D366; color: var(--white); box-shadow: 0 4px 12px rgba(37,211,102,0.3); }
+
+        /* ── Empty results ── */
+        .results-empty {
+            background: var(--white); border: 2px dashed #e0d8d0; border-radius: var(--radius-lg);
+            display: flex; align-items: center; justify-content: center; text-align: center;
+            padding: 5rem 2rem; min-height: 400px;
+        }
+        .results-empty i { width: 48px; height: 48px; color: #d4ccc2; margin-bottom: 1rem; }
+        .results-empty h3 { font-family: var(--font-serif); font-size: 1.3rem; color: var(--gray); font-weight: 700; margin-bottom: 0.5rem; }
+        .results-empty p { font-size: 0.88rem; color: #b5a898; max-width: 280px; margin: 0 auto; }
+
+        /* Processing */
+        .processing-state {
+            background: var(--white); border-radius: var(--radius-lg);
+            display: flex; align-items: center; justify-content: center; flex-direction: column;
+            padding: 5rem 2rem; min-height: 400px; box-shadow: var(--shadow-sm);
+        }
+        @keyframes spin-slow { to { transform: rotate(360deg); } }
+        .spinner {
+            width: 56px; height: 56px; border: 3px solid #e8e0d6; border-top-color: var(--orange);
+            border-radius: 50%; animation: spin-slow 1.2s linear infinite; margin-bottom: 1.5rem;
+        }
+        .processing-state h3 { font-family: var(--font-serif); font-size: 1.2rem; font-weight: 700; color: var(--brown); }
+        .processing-state p { font-size: 0.85rem; color: var(--gray); margin-top: 0.5rem; max-width: 300px; text-align: center; }
+
+        /* Error */
+        .error-banner {
+            background: #fef2f2; border: 1.5px solid rgba(211,47,47,0.2); border-radius: var(--radius-sm);
+            padding: 1rem 1.25rem; display: flex; align-items: flex-start; gap: 0.75rem;
+        }
+        .error-banner i { color: var(--red); width: 20px; height: 20px; flex-shrink: 0; margin-top: 1px; }
+        .error-banner strong { font-size: 0.88rem; color: var(--red); }
+        .error-banner p { font-size: 0.8rem; color: #9a4040; margin-top: 0.15rem; }
+
+        /* ── Footer ── */
+        .footer { text-align: center; padding: 2rem 0; font-size: 0.75rem; color: var(--gray); border-top: 1px solid #e8e0d6; }
+
+        /* Toast */
+        .toast {
+            position: fixed; bottom: 2rem; right: 2rem; z-index: 200;
+            background: var(--brown); color: var(--white); padding: 0.85rem 1.5rem;
+            border-radius: var(--radius-sm); box-shadow: var(--shadow-lg);
+            font-size: 0.88rem; font-weight: 500; display: flex; align-items: center; gap: 0.5rem;
+            animation: toastIn 0.35s var(--ease);
+        }
+        .toast i { color: var(--gold); width: 18px; height: 18px; }
+        @keyframes toastIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ══ RESPONSIVE ══ */
+        @media (max-width: 900px) {
+            .main-grid { grid-template-columns: 1fr; }
+            .nav-origin { display: none; }
+            .stats-row { grid-template-columns: repeat(3, 1fr); }
+            .toggle-bar { flex-direction: column; align-items: flex-start; }
+        }
+        @media (max-width: 600px) {
+            html { font-size: 14.5px; }
+            .container { padding: 0 1rem; }
+            .nav-brand { gap: 0.5rem; }
+            .nav-logo-img { width: 38px; height: 38px; }
+            .stats-row { grid-template-columns: 1fr; }
+            .toggle-pills { flex-wrap: wrap; justify-content: stretch; width: 100%; }
+            .toggle-pill { flex: 1; text-align: center; justify-content: center; }
+            
+            .export-bar { flex-direction: column; align-items: stretch; text-align: center; gap: 1rem; }
+            .export-title { margin-bottom: 0.5rem; }
+            .export-actions { 
+                display: grid; 
+                grid-template-columns: 1fr 1fr; 
+                gap: 0.5rem; 
+                width: 100%;
+            }
+            .btn-export { width: 100%; justify-content: center; }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ================================================================ -->
+    <!-- VUE APP                                                          -->
+    <!-- ================================================================ -->
+    <div id="app">
+
+        <!-- Navbar -->
+        <nav class="navbar">
+            <div class="container nav-inner">
+                <div class="nav-brand">
+                    <img src="./assets/logo.jpg" alt="Logo Recanto" class="nav-logo-img">
+                    <div>
+                        <div class="nav-title">Recanto <span>da Feijoada</span></div>
+                        <div class="nav-subtitle">Roteirizador de Entregas</div>
+                    </div>
+                </div>
+                <div style="display:flex; align-items:center; gap:0.5rem;">
+                    <div class="nav-origin">
+                        <img src="./assets/logo.jpg" alt="Origem" class="nav-origin-img">
+                        <div>
+                            <div class="nav-origin-label">Origem</div>
+                            <div class="nav-origin-text">Farolândia, Aracaju</div>
+                        </div>
+                    </div>
+                    <button class="dark-toggle" @click="toggleDark" :title="isDark ? 'Modo Claro' : 'Modo Escuro'">
+                        <svg v-if="isDark" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                        <svg v-else xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <main class="container">
+            <div class="main-grid">
+
+                <!-- ============================================ -->
+                <!-- LEFT — Sidebar                               -->
+                <!-- ============================================ -->
+                <div class="sidebar">
+
+                    <!-- Add Order Card -->
+                    <div class="card">
+                        <div class="card-title"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg> Adicionar Parada</div>
+                        <form @submit.prevent="addOrder" style="display:flex; flex-direction:column; gap:1rem;">
+                            <div>
+                                <label for="input-address" class="field-label">Endereço de entrega</label>
+                                <input id="input-address" v-model="newAddress" type="text" required class="text-input" placeholder="Rua X, Bairro, Aracaju">
+                            </div>
+                            <div style="display:flex; align-items:flex-end; gap:0.75rem;">
+                                <div style="flex:1;">
+                                    <label class="field-label">Qtd. Feijoadas</label>
+                                    <div class="counter">
+                                        <button type="button" class="counter-btn" @click="decrementAmount">−</button>
+                                        <input v-model.number="newAmount" type="number" min="1" class="counter-val" style="border:none;background:none;font-family:inherit;width:40px;text-align:center;font-size:1.05rem;font-weight:700;">
+                                        <button type="button" class="counter-btn" @click="incrementAmount">+</button>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary" :disabled="orders.length >= 12">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Inserir
+                                </button>
+                            </div>
+                        </form>
+                        <div v-if="orders.length >= 12" style="margin-top:1rem; background:#fef2f2; border:1px solid rgba(211,47,47,0.15); border-radius:8px; padding:0.75rem; font-size:0.8rem; color:#b71c1c; display:flex; align-items:center; gap:0.5rem;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                            Limite de 12 paradas atingido.
+                        </div>
+                    </div>
+
+                    <!-- Block List Card -->
+                    <div class="card" style="padding-bottom:1rem;">
+                        <div class="block-header">
+                            <div class="card-title" style="margin-bottom:0;"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg> Bloco Atual</div>
+                            <div style="display:flex; align-items:center; gap:0.5rem;">
+                                <button v-if="orders.length > 0" @click="clearBlock" class="block-clear">Limpar</button>
+                                <span class="block-badge">{{ orders.length }}/12</span>
+                            </div>
+                        </div>
+
+                        <!-- Empty -->
+                        <div v-if="orders.length === 0" class="empty-state">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:#d4ccc2;margin:0 auto 0.75rem;"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+                            <p>Nenhum pedido adicionado.</p>
+                        </div>
+
+                        <!-- Items -->
+                        <div v-else style="max-height:380px; overflow-y:auto; padding-right:4px;">
+                            <div v-for="(o, idx) in orders" :key="idx" class="order-item" style="flex-direction:column; gap:0.5rem;">
+                                <!-- View mode -->
+                                <template v-if="editingIndex !== idx">
+                                    <div style="display:flex; align-items:center; gap:0.75rem; width:100%;">
+                                        <div class="order-item-num">{{ idx + 1 }}</div>
+                                        <div class="order-item-info">
+                                            <div class="order-item-addr" :title="o.address">{{ o.address }}</div>
+                                            <div class="order-item-qty">{{ o.amount }}× Feijoada</div>
+                                        </div>
+                                        <div style="display:flex; align-items:center; gap:2px; flex-shrink:0;">
+                                            <button @click="moveUp(idx)" :disabled="idx === 0" class="order-action-btn" title="Mover para cima">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+                                            </button>
+                                            <button @click="moveDown(idx)" :disabled="idx === orders.length - 1" class="order-action-btn" title="Mover para baixo">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                                            </button>
+                                            <button @click="startEdit(idx)" class="order-action-btn" title="Editar">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                                            </button>
+                                            <button @click="removeOrder(idx)" class="order-action-btn order-action-btn-danger" title="Remover">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </template>
+                                <!-- Edit mode -->
+                                <template v-else>
+                                    <div style="width:100%; display:flex; flex-direction:column; gap:0.5rem;">
+                                        <input v-model="editAddress" type="text" class="text-input" style="font-size:0.85rem; padding:0.6rem 0.75rem;">
+                                        <div style="display:flex; align-items:center; gap:0.5rem;">
+                                            <div class="counter" style="flex:1;">
+                                                <button type="button" class="counter-btn" @click="editAmount > 1 ? editAmount-- : null" style="width:32px;height:32px;">−</button>
+                                                <input v-model.number="editAmount" type="number" min="1" style="border:none;background:none;font-family:inherit;width:32px;text-align:center;font-weight:700;">
+                                                <button type="button" class="counter-btn" @click="editAmount++" style="width:32px;height:32px;">+</button>
+                                            </div>
+                                            <button @click="saveEdit" class="btn btn-primary" style="padding:0.5rem 1rem; font-size:0.8rem;">Salvar</button>
+                                            <button @click="cancelEdit" class="order-action-btn" style="padding:0.4rem;" title="Cancelar">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Generate Button -->
+                        <div style="padding:1rem 0 0;">
+                            <button id="btn-generate" @click="processRoute" class="btn btn-generate" :disabled="orders.length === 0 || isProcessing">
+                                <template v-if="isProcessing">
+                                    <svg style="width:20px;height:20px;" class="animate-spin" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-dasharray="32" stroke-linecap="round"/></svg>
+                                    Otimizando Rota…
+                                </template>
+                                <template v-else>
+                                    <i data-lucide="route" style="width:20px;height:20px;"></i>
+                                    Gerar Rota Otimizada
+                                </template>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ============================================ -->
+                <!-- RIGHT — Results                              -->
+                <!-- ============================================ -->
+                <div>
+                    <!-- Error -->
+                    <div v-if="errorMessage" class="error-banner" style="margin-bottom:1.5rem;">
+                        <i data-lucide="alert-circle"></i>
+                        <div><strong>Erro ao processar</strong><p>{{ errorMessage }}</p></div>
+                    </div>
+
+                    <!-- Empty state -->
+                    <div v-if="!hasResults && !isProcessing" class="results-empty">
+                        <div>
+                            <i data-lucide="compass"></i>
+                            <h3>Área de Visualização</h3>
+                            <p>Adicione pedidos e clique em "Gerar Rota" para otimizar a sequência de entregas.</p>
+                        </div>
+                    </div>
+
+                    <!-- Processing -->
+                    <div v-if="isProcessing" class="processing-state">
+                        <div class="spinner"></div>
+                        <h3>Geolocalizando endereços…</h3>
+                        <p>A API de mapas processa 1 endereço por segundo. Aguarde alguns instantes.</p>
+                    </div>
+
+                    <!-- Results -->
+                    <div v-if="hasResults && !isProcessing" class="results-panel">
+
+                        <!-- Stats -->
+                        <div class="stats-row">
+                            <div class="stat-card">
+                                <i data-lucide="map-pin" style="width:22px;height:22px;"></i>
+                                <div class="stat-label">Paradas</div>
+                                <div class="stat-value">{{ results.summary.total_stops }}</div>
+                            </div>
+                            <div class="stat-card">
+                                <i data-lucide="utensils" style="width:22px;height:22px;"></i>
+                                <div class="stat-label">Feijoadas</div>
+                                <div class="stat-value">{{ results.summary.total_amount }}</div>
+                            </div>
+                            <div class="stat-card">
+                                <i data-lucide="ruler" style="width:22px;height:22px;"></i>
+                                <div class="stat-label">Distância</div>
+                                <div class="stat-value">{{ currentDistance }} <span class="stat-unit">km</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Toggle -->
+                        <div class="toggle-bar">
+                            <div class="toggle-info">
+                                <h3>Modo de Visualização</h3>
+                                <p v-if="isOptimizedView">Rota otimizada pelo Vizinho Mais Próximo.</p>
+                                <p v-else>Ordem cronológica de inserção dos pedidos.</p>
+                            </div>
+                            <div class="toggle-pills">
+                                <button @click="isOptimizedView = false" class="toggle-pill" :class="{ active: !isOptimizedView }">Inserção</button>
+                                <button @click="isOptimizedView = true" class="toggle-pill" :class="{ 'active-opt': isOptimizedView }">
+                                    <i data-lucide="zap"></i> Otimizada
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Timeline -->
+                        <div class="timeline-card">
+                            <!-- Origin -->
+                            <div class="origin-row">
+                                <div style="display:flex;flex-direction:column;align-items:center;">
+                                    <div class="origin-dot"><i data-lucide="store"></i></div>
+                                    <div class="origin-line-down"></div>
+                                </div>
+                                <div>
+                                    <div class="origin-eyebrow">Ponto de Partida</div>
+                                    <div class="origin-name">Recanto da Feijoada</div>
+                                    <div class="origin-sub">Farolândia, Aracaju</div>
+                                </div>
+                            </div>
+
+                            <!-- Stops -->
+                            <div v-for="(node, idx) in currentViewList" :key="idx + '-' + node.address" class="stop-row">
+                                <div class="stop-track">
+                                    <div class="stop-dot"></div>
+                                    <div v-if="idx < currentViewList.length - 1" class="stop-line"></div>
+                                </div>
+                                <div class="stop-content">
+                                    <div>
+                                        <div class="stop-badge">Parada {{ idx + 1 }}</div>
+                                        <div class="stop-addr">{{ node.address }}</div>
+                                    </div>
+                                    <div class="stop-qty-box">
+                                        <div class="stop-qty-num">{{ node.amount }}</div>
+                                        <div class="stop-qty-label">feijoada</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Geo Errors Warning -->
+                        <div v-if="geoErrors.length > 0" class="error-banner" style="margin-bottom:0;">
+                            <i data-lucide="alert-triangle"></i>
+                            <div>
+                                <strong>{{ geoErrors.length }} endereço(s) não localizado(s)</strong>
+                                <p v-for="err in geoErrors" :key="err.index" style="margin-top:0.25rem;">
+                                    · {{ err.address }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Export Bar -->
+                        <div class="export-bar">
+                            <div class="export-title">Exportar Rota</div>
+                            <div class="export-actions">
+                                <button class="btn-export btn-export-gmaps" @click="exportGoogleMaps">
+                                    <i data-lucide="map" style="width:14px;height:14px;"></i> Google Maps
+                                </button>
+                                <button class="btn-export btn-export-waze" @click="exportWaze">
+                                    <i data-lucide="navigation" style="width:14px;height:14px;"></i> Waze
+                                </button>
+                                <button class="btn-export btn-export-whatsapp" @click="exportWhatsApp">
+                                    <i data-lucide="message-circle"></i> WhatsApp
+                                </button>
+                                <button class="btn-export" @click="exportClipboard">
+                                    <i data-lucide="clipboard-copy"></i> Copiar
+                                </button>
+                                <button class="btn-export" @click="exportCSV">
+                                    <i data-lucide="file-spreadsheet"></i> CSV
+                                </button>
+                                <button class="btn-export" @click="exportPrint">
+                                    <i data-lucide="printer"></i> Imprimir
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">© 2026 Recanto da Feijoada · Roteirização inteligente por Haversine + Nearest Neighbor</footer>
+
+        <!-- Toast -->
+        <div v-if="toastMessage" class="toast">
+            <i data-lucide="check-circle"></i>
+            {{ toastMessage }}
+        </div>
+    </div>
+
+    <script src="./app.js"></script>
+</body>
+</html>
