@@ -238,6 +238,7 @@ def nearest_neighbor(matrix: list[list[float]], num_nodes: int) -> list[int]:
 class OrderItem(BaseModel):
     address: str = Field(..., min_length=3, description="Endereço de entrega")
     amount: int = Field(..., ge=1, description="Quantidade de feijoadas")
+    complement: str = Field(default="", description="Complemento ou Ponto de Ref.")
 
 
 class RouteRequest(BaseModel):
@@ -247,6 +248,7 @@ class RouteRequest(BaseModel):
 class RouteNode(BaseModel):
     address: str
     amount: int
+    complement: str
     lat: float
     lon: float
 
@@ -288,11 +290,18 @@ def optimize_route(req: RouteRequest):
         key = _strip_accents(order.address.strip().lower())
         if key in consolidated:
             consolidated[key]["amount"] += order.amount
+            if order.complement:
+                if consolidated[key]["complement"]:
+                    if order.complement.lower() not in consolidated[key]["complement"].lower():
+                        consolidated[key]["complement"] += f" | {order.complement}"
+                else:
+                    consolidated[key]["complement"] = order.complement
         else:
             consolidated[key] = {
                 "original_idx": idx,
                 "address": order.address.strip(),
                 "amount": order.amount,
+                "complement": order.complement.strip() if order.complement else "",
             }
 
     unique_orders = sorted(consolidated.values(), key=lambda x: x["original_idx"])
@@ -314,6 +323,7 @@ def optimize_route(req: RouteRequest):
         nodes.append({
             "address": entry["address"],
             "amount": entry["amount"],
+            "complement": entry["complement"],
             "lat": coords[0],
             "lon": coords[1],
         })

@@ -33,6 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
 const App = {
     setup() {
         const newAddress = ref("");
+        const newComplement = ref("");
         const newAmount = ref(1);
         const orders = ref([]);
         const isProcessing = ref(false);
@@ -55,11 +56,13 @@ const App = {
         // ── Edit mode ──
         const editingIndex = ref(-1);
         const editAddress = ref("");
+        const editComplement = ref("");
         const editAmount = ref(1);
 
         function startEdit(index) {
             editingIndex.value = index;
             editAddress.value = orders.value[index].address;
+            editComplement.value = orders.value[index].complement || "";
             editAmount.value = orders.value[index].amount;
             refreshIcons();
         }
@@ -73,6 +76,7 @@ const App = {
             if (editingIndex.value < 0) return;
             if (!editAddress.value.trim() || editAmount.value < 1) return;
             orders.value[editingIndex.value].address = editAddress.value.trim();
+            orders.value[editingIndex.value].complement = editComplement.value.trim();
             orders.value[editingIndex.value].amount = editAmount.value;
             editingIndex.value = -1;
             results.value = null; // Invalida resultados anteriores
@@ -136,8 +140,9 @@ const App = {
         function addOrder() {
             if (!newAddress.value.trim() || newAmount.value < 1) return;
             if (orders.value.length >= 12) return;
-            orders.value.push({ address: newAddress.value.trim(), amount: newAmount.value });
+            orders.value.push({ address: newAddress.value.trim(), complement: newComplement.value.trim(), amount: newAmount.value });
             newAddress.value = "";
+            newComplement.value = "";
             newAmount.value = 1;
             errorMessage.value = "";
             refreshIcons();
@@ -211,7 +216,8 @@ const App = {
             text += `🏠 ORIGEM: Farolândia, Aracaju\n\n`;
 
             list.forEach((n, i) => {
-                text += `${i + 1}. ${n.address} — ${n.amount}× feijoada\n`;
+                const comp = n.complement ? ` (${n.complement})` : "";
+                text += `${i + 1}. ${n.address}${comp} — ${n.amount}× feijoada\n`;
             });
 
             text += `\n─────────────────────\n`;
@@ -244,10 +250,11 @@ const App = {
         function exportCSV() {
             if (!hasResults.value) return;
             const list = currentViewList.value;
-            let csv = "Parada,Endereço,Feijoadas,Latitude,Longitude\n";
-            csv += `0,"Recanto da Feijoada — Farolândia, Aracaju",—,-10.9746052,-37.063972\n`;
+            let csv = "Parada,Endereço,Complemento,Feijoadas,Latitude,Longitude\n";
+            csv += `0,"Recanto da Feijoada — Farolândia, Aracaju","",—,-10.9746052,-37.063972\n`;
             list.forEach((n, i) => {
-                csv += `${i + 1},"${n.address.replace(/"/g, '""')}",${n.amount},${n.lat},${n.lon}\n`;
+                const comp = n.complement ? n.complement.replace(/"/g, '""') : "";
+                csv += `${i + 1},"${n.address.replace(/"/g, '""')}","${comp}",${n.amount},${n.lat},${n.lon}\n`;
             });
             const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
             const url = URL.createObjectURL(blob);
@@ -308,11 +315,11 @@ const App = {
         }
 
         return {
-            newAddress, newAmount, orders, isProcessing, errorMessage, results,
+            newAddress, newComplement, newAmount, orders, isProcessing, errorMessage, results,
             hasResults, isOptimizedView, currentViewList, currentDistance, toastMessage,
             geoErrors,
             isDark, toggleDark,
-            editingIndex, editAddress, editAmount, startEdit, cancelEdit, saveEdit,
+            editingIndex, editAddress, editComplement, editAmount, startEdit, cancelEdit, saveEdit,
             moveUp, moveDown,
             decrementAmount, incrementAmount, addOrder, removeOrder, clearBlock, processRoute,
             exportWhatsApp, exportClipboard, exportCSV, exportPrint, exportGoogleMaps, exportWaze,

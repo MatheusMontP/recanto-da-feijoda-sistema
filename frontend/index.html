@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="description" content="Recanto da Feijoada — Sistema de Roteirização de Entregas">
     <title>Recanto da Feijoada · Roteirizador</title>
 
@@ -101,7 +101,7 @@
 
         /* ── Reset ── */
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        html, body { overflow-x: hidden; width: 100%; }
+        html, body { overflow-x: hidden; width: 100%; position: relative; }
         html { scroll-behavior: smooth; font-size: 16px; }
         body {
             font-family: var(--font-sans);
@@ -196,7 +196,7 @@
         .text-input {
             width: 100%; padding: 0.85rem 1rem;
             border: 1.5px solid #e0d8d0; border-radius: var(--radius-sm);
-            font-family: var(--font-sans); font-size: 0.95rem;
+            font-family: var(--font-sans); font-size: 16px; /* 16px prevents iOS auto-zoom */
             color: var(--brown); background: var(--white);
             transition: border-color 0.15s var(--ease), box-shadow 0.15s var(--ease);
         }
@@ -405,8 +405,10 @@
 
         /* Error */
         .error-banner {
-            background: #fef2f2; border: 1.5px solid rgba(211,47,47,0.2); border-radius: var(--radius-sm);
+            background: #fff0f0; border: 1.5px solid rgba(211,47,47,0.15); border-radius: var(--radius-md);
             padding: 1rem 1.25rem; display: flex; align-items: flex-start; gap: 0.75rem;
+            color: #b71c1c; font-size: 0.9rem; margin-bottom: 2rem;
+            word-break: break-word; overflow-wrap: break-word;
         }
         .error-banner i { color: var(--red); width: 20px; height: 20px; flex-shrink: 0; margin-top: 1px; }
         .error-banner strong { font-size: 0.88rem; color: var(--red); }
@@ -442,15 +444,47 @@
             .toggle-pills { flex-wrap: wrap; justify-content: stretch; width: 100%; }
             .toggle-pill { flex: 1; text-align: center; justify-content: center; }
             
+            /* Premium UX Mobile */
+            .sidebar { gap: 1rem; }
+            .card { padding: 1.25rem; box-shadow: var(--shadow-sm); border-radius: var(--radius-md); }
+            
+            .form-row-mobile { flex-direction: column !important; align-items: stretch !important; gap: 1rem !important; }
+            .form-row-mobile > div { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+            .form-row-mobile .btn { width: 100%; padding: 1.1rem; font-size: 1.1rem; }
+            
+            .order-item-mobile { flex-direction: column !important; align-items: flex-start !important; gap: 0.85rem !important; }
+            .order-item-mobile > div:first-child { width: 100%; }
+            .order-item-actions { width: 100%; display: flex; justify-content: space-between; border-top: 1px dashed rgba(0,0,0,0.1); padding-top: 0.75rem; }
+            .order-action-btn { flex: 1; display: flex; justify-content: center; padding: 0.75rem 0; background: rgba(0,0,0,0.03); border-radius: var(--radius-sm); margin: 0 2px; }
+
+            .nav-brand { gap: 0.5rem; }
+            .nav-logo-img { width: 38px; height: 38px; }
+            .stats-row { grid-template-columns: 1fr; }
+            .toggle-pills { flex-wrap: wrap; justify-content: stretch; width: 100%; }
+            .toggle-pill { flex: 1; text-align: center; justify-content: center; }
+            
             .export-bar { flex-direction: column; align-items: stretch; text-align: center; gap: 1rem; }
             .export-title { margin-bottom: 0.5rem; }
             .export-actions { 
-                display: grid; 
-                grid-template-columns: 1fr 1fr; 
+                display: flex; 
+                flex-direction: column;
                 gap: 0.5rem; 
                 width: 100%;
             }
             .btn-export { width: 100%; justify-content: center; }
+            
+            /* Results Panel fixes */
+            .timeline-card { padding: 1.25rem 1rem; }
+            .stop-row { overflow: hidden; width: 100%; box-sizing: border-box; }
+            .stop-content { min-width: 0; padding: 1rem; overflow-wrap: break-word; word-break: break-word; }
+            .stop-addr, .origin-name { word-break: break-word; overflow-wrap: break-word; white-space: normal; }
+            .stop-qty-box { padding: 0.25rem 0.6rem; font-size: 0.75rem; white-space: nowrap; flex-shrink: 0; }
+            
+            .error-banner, .results-panel { width: 100%; box-sizing: border-box; overflow-x: hidden; }
+            
+            /* Swap order on mobile when results exist */
+            .main-grid { display: flex; flex-direction: column; gap: 2rem; }
+            .main-grid.route-generated { flex-direction: column-reverse; }
         }
     </style>
 </head>
@@ -488,12 +522,26 @@
         </nav>
 
         <main class="container">
-            <div class="main-grid">
+            <div class="main-grid" :class="{'route-generated': hasResults || isProcessing}">
 
                 <!-- ============================================ -->
                 <!-- LEFT — Sidebar                               -->
                 <!-- ============================================ -->
                 <div class="sidebar">
+
+                    <!-- Instruction Manual Component -->
+                    <div class="card" style="background:#fffcf5; border:1px solid #f2e6d9;">
+                        <div style="display:flex; align-items:flex-start; gap:0.75rem;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--orange);flex-shrink:0;margin-top:2px;"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                            <div>
+                                <h3 style="font-size:1rem;font-weight:700;color:var(--brown);margin-bottom:0.25rem;">Como roteirizar bem?</h3>
+                                <ul style="font-size:0.85rem;color:var(--gray);line-height:1.5;padding-left:1.2rem;margin-bottom:0;">
+                                    <li style="margin-bottom:0.4rem;"><b>Acentos:</b> Esqueça os acentos. <i style="opacity:0.8">Farolandia</i> ou <i style="opacity:0.8">Farolândia</i> funcionam perfeitamente.</li>
+                                    <li style="margin-bottom:0.4rem;"><b>Padrão de ouro:</b> O mais exato é fornecer: <b>Rua, Número, Bairro</b>. Isso garante a localização exata do pino do mapa.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
 
                     <!-- Add Order Card -->
                     <div class="card">
@@ -501,9 +549,13 @@
                         <form @submit.prevent="addOrder" style="display:flex; flex-direction:column; gap:1rem;">
                             <div>
                                 <label for="input-address" class="field-label">Endereço de entrega</label>
-                                <input id="input-address" v-model="newAddress" type="text" required class="text-input" placeholder="Rua X, Bairro, Aracaju">
+                                <input id="input-address" v-model="newAddress" type="text" required class="text-input" placeholder="Rua X, 123, Bairro">
                             </div>
-                            <div style="display:flex; align-items:flex-end; gap:0.75rem;">
+                            <div>
+                                <label for="input-complement" class="field-label">Complemento (Opcional)</label>
+                                <input id="input-complement" v-model="newComplement" type="text" class="text-input" placeholder="Apt 302, Bloco B, Casa Verde...">
+                            </div>
+                            <div class="form-row-mobile" style="display:flex; align-items:flex-end; gap:0.75rem;">
                                 <div style="flex:1;">
                                     <label class="field-label">Qtd. Feijoadas</label>
                                     <div class="counter">
@@ -541,16 +593,17 @@
 
                         <!-- Items -->
                         <div v-else style="max-height:380px; overflow-y:auto; padding-right:4px;">
-                            <div v-for="(o, idx) in orders" :key="idx" class="order-item" style="flex-direction:column; gap:0.5rem;">
+                            <div v-for="(o, idx) in orders" :key="idx" class="order-item order-item-mobile" style="flex-direction:column; gap:0.5rem;">
                                 <!-- View mode -->
                                 <template v-if="editingIndex !== idx">
                                     <div style="display:flex; align-items:center; gap:0.75rem; width:100%;">
                                         <div class="order-item-num">{{ idx + 1 }}</div>
                                         <div class="order-item-info">
                                             <div class="order-item-addr" :title="o.address">{{ o.address }}</div>
+                                            <div v-if="o.complement" style="font-size: 0.75rem; color: var(--gray); margin-bottom:0.25rem;">{{ o.complement }}</div>
                                             <div class="order-item-qty">{{ o.amount }}× Feijoada</div>
                                         </div>
-                                        <div style="display:flex; align-items:center; gap:2px; flex-shrink:0;">
+                                        <div class="order-item-actions" style="display:flex; align-items:center; gap:2px; flex-shrink:0;">
                                             <button @click="moveUp(idx)" :disabled="idx === 0" class="order-action-btn" title="Mover para cima">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
                                             </button>
@@ -569,15 +622,16 @@
                                 <!-- Edit mode -->
                                 <template v-else>
                                     <div style="width:100%; display:flex; flex-direction:column; gap:0.5rem;">
-                                        <input v-model="editAddress" type="text" class="text-input" style="font-size:0.85rem; padding:0.6rem 0.75rem;">
-                                        <div style="display:flex; align-items:center; gap:0.5rem;">
+                                        <input v-model="editAddress" type="text" class="text-input" style="font-size:16px; padding:0.6rem 0.75rem;" placeholder="Rua, Número, Bairro">
+                                        <input v-model="editComplement" type="text" class="text-input" style="font-size:16px; padding:0.6rem 0.75rem;" placeholder="Complemento (Opcional)">
+                                        <div class="order-item-actions" style="display:flex; align-items:center; gap:0.5rem;">
                                             <div class="counter" style="flex:1;">
                                                 <button type="button" class="counter-btn" @click="editAmount > 1 ? editAmount-- : null" style="width:32px;height:32px;">−</button>
-                                                <input v-model.number="editAmount" type="number" min="1" style="border:none;background:none;font-family:inherit;width:32px;text-align:center;font-weight:700;">
+                                                <input v-model.number="editAmount" type="number" min="1" style="font-size:16px; border:none;background:none;font-family:inherit;width:32px;text-align:center;font-weight:700;">
                                                 <button type="button" class="counter-btn" @click="editAmount++" style="width:32px;height:32px;">+</button>
                                             </div>
-                                            <button @click="saveEdit" class="btn btn-primary" style="padding:0.5rem 1rem; font-size:0.8rem;">Salvar</button>
-                                            <button @click="cancelEdit" class="order-action-btn" style="padding:0.4rem;" title="Cancelar">
+                                            <button @click="saveEdit" class="btn btn-primary" style="padding:0.5rem 1rem; font-size:0.8rem; flex:2;">Salvar</button>
+                                            <button @click="cancelEdit" class="order-action-btn order-action-btn-danger" style="padding:0.4rem; justify-content:center; display:flex;" title="Cancelar">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                                             </button>
                                         </div>
