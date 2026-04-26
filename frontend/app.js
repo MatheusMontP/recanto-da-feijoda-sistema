@@ -248,7 +248,7 @@ const App = {
             if (!hasResults.value) return;
             const list = currentViewList.value;
             let csv = "Parada,Endereço,Complemento,Feijoadas,Latitude,Longitude\n";
-            csv += `0,"Recanto da Feijoada — Farolândia, Aracaju","",—,-10.9746052,-37.063972\n`;
+            csv += `0,"Recanto da Feijoada — R. Brasílio Martinho Vale, 46, Farolândia, Aracaju","",—,-10.97075,-37.06333\n`;
             list.forEach((n, i) => {
                 const comp = n.complement ? n.complement.replace(/"/g, '""') : "";
                 csv += `${i + 1},"${n.address.replace(/"/g, '""')}","${comp}",${n.amount},${n.lat},${n.lon}\n`;
@@ -280,7 +280,7 @@ const App = {
             if (!hasResults.value) return;
             const list = currentViewList.value;
             // Google Maps directions: origin / waypoint1 / waypoint2 / ... / destination
-            const origin = "-10.9746052,-37.063972";
+            const origin = "-10.97075,-37.06333"; // R. Brasílio Martinho Vale, 46 — Farolândia
             const stops = list.map(n => `${n.lat},${n.lon}`);
             const destination = stops.pop(); // Last stop is destination
             let url = `https://www.google.com/maps/dir/${origin}`;
