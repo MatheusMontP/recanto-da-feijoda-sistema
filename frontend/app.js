@@ -383,13 +383,17 @@ const App = {
         function exportGoogleMaps() {
             if (!hasResults.value) return;
             const list = currentViewList.value;
-            // Google Maps directions: origin / waypoint1 / waypoint2 / ... / destination
-            const origin = "-10.97075,-37.06333"; // R. Brasílio Martinho Vale, 46 — Farolândia
-            const stops = list.map(n => `${n.lat},${n.lon}`);
-            const destination = stops.pop(); // Last stop is destination
+            // Enviar os endereços em texto force o Google Maps a usar o próprio geocoder de alta precisão
+            // ao invés de aceitar as coordenadas do OpenStreetMap que podem causar incongruência de número na rua
+            const origin = encodeURIComponent("R. Brasílio Martinho Vale, 46, Farolândia, Aracaju");
+            const stops = list.map(n => encodeURIComponent(n.address));
+            
             let url = `https://www.google.com/maps/dir/${origin}`;
-            stops.forEach(s => { url += `/${s}`; });
-            url += `/${destination}`;
+            if (stops.length > 0) {
+                const destination = stops.pop();
+                stops.forEach(s => { url += `/${s}`; });
+                url += `/${destination}`;
+            }
             window.open(url, "_blank");
             showToast("Abrindo Google Maps…");
         }
