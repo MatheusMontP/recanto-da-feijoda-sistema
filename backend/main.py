@@ -38,9 +38,9 @@ logger = logging.getLogger("lucromaximo")
 # Configuração
 # ---------------------------------------------------------------------------
 RESTAURANTE_NOME = "Recanto da Feijoada"
-RESTAURANTE_ENDERECO = "Farolândia, Aracaju"
-# Coordenadas fixas da origem (Rua Martinho Brasilio Valle, 46 — Farolândia)
-RESTAURANTE_COORDS = (-10.9746052, -37.063972)
+RESTAURANTE_ENDERECO = "R. Brasílio Martinho Vale, 46 - Farolândia, Aracaju - SE"
+# Coordenadas fixas da origem (R. Brasílio Martinho Vale, 46 — Farolândia, Aracaju)
+RESTAURANTE_COORDS = (-10.97075, -37.06333)
 
 MAX_PARADAS_POR_BLOCO = 12
 

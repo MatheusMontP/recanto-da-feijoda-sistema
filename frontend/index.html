@@ -221,8 +221,11 @@
         .field-gap { margin-top: .5rem; }
 
         .qty-row {
-            display: flex; gap: .6rem; align-items: flex-end; margin-top: .5rem;
+            display: flex; align-items: center; justify-content: space-between;
+            gap: .6rem; margin-top: .5rem;
         }
+        .qty-label { font-size: .7rem; font-weight: 600; color: var(--c-txt-3); letter-spacing:.02em; }
+        .btn-add-wrap { margin-top: .5rem; }
         .counter {
             display: flex; align-items: center;
             border: 1.5px solid var(--c-border2); border-radius: var(--r-md);
@@ -240,7 +243,7 @@
             background: transparent; border: none; font-family: var(--font);
         }
         .btn-add {
-            flex: 1; height: 40px;
+            width: 100%; height: 40px;
             display: flex; align-items: center; justify-content: center; gap: .35rem;
             background: var(--c-accent); color: #fff;
             border-radius: var(--r-md); font-size: .83rem; font-weight: 600;
@@ -629,15 +632,15 @@
                             class="text-input" placeholder="Apt 302, Bloco B…">
                     </div>
 
-                    <div class="qty-row">
-                        <div>
-                            <label class="field-label">Qtd.</label>
-                            <div class="counter">
-                                <button type="button" class="counter-btn" @click="decrementAmount">−</button>
-                                <input v-model.number="newAmount" type="number" min="1" class="counter-val">
-                                <button type="button" class="counter-btn" @click="incrementAmount">+</button>
-                            </div>
+                    <div class="qty-row field-gap">
+                        <span class="qty-label">Qtd. Feijoadas</span>
+                        <div class="counter">
+                            <button type="button" class="counter-btn" @click="decrementAmount">−</button>
+                            <input v-model.number="newAmount" type="number" min="1" class="counter-val">
+                            <button type="button" class="counter-btn" @click="incrementAmount">+</button>
                         </div>
+                    </div>
+                    <div class="btn-add-wrap">
                         <button type="submit" class="btn-add" :disabled="orders.length >= 12">
                             <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                             Inserir Parada
@@ -828,7 +831,7 @@
                         <div>
                             <div class="o-eyebrow">Ponto de Partida</div>
                             <div class="o-name">Recanto da Feijoada</div>
-                            <div class="o-sub">Farolândia, Aracaju — SE</div>
+                            <div class="o-sub">R. Brasílio Martinho Vale, 46 — Farolândia, Aracaju</div>
                         </div>
                     </div>
 
