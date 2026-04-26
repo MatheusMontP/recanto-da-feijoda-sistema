@@ -170,9 +170,27 @@ def haversine(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
 # ---------------------------------------------------------------------------
 # Algoritmos de Rota (Cálculo de Matriz e Otimização)
 # ---------------------------------------------------------------------------
+
+EXPANSION_KEYWORDS = [
+    "aruana", "jabotiana", "mosqueiro", "robalo", "naufragos", 
+    "areia branca", "gameleira", "matapua", "santa maria", "17 de marco", 
+    "expansao"
+]
+
+def get_circuity_multiplier(addr1: str, addr2: str) -> float:
+    """Retorna o fator de sinuosidade baseado no perfil dos bairros (Expansão 1.45x vs Centro/Grid 1.25x)."""
+    a1 = _strip_accents(addr1.lower())
+    a2 = _strip_accents(addr2.lower())
+    
+    for kw in EXPANSION_KEYWORDS:
+        if kw in a1 or kw in a2:
+            return 1.45
+    return 1.25
+
 def build_distance_matrix(origin_coords: tuple[float, float], nodes: list[dict]) -> list[list[float]]:
     """Gera matriz de distâncias (em km). Tenta usar OSRM (ruas reais), usa Haversine como fallback."""
     all_coords = [origin_coords] + [(n["lat"], n["lon"]) for n in nodes]
+    all_addrs = [RESTAURANTE_ENDERECO] + [n["address"] for n in nodes]
     
     # 1. Tentativa via OSRM (API Pública)
     try:
@@ -202,7 +220,9 @@ def build_distance_matrix(origin_coords: tuple[float, float], nodes: list[dict])
             if i == j:
                 row.append(0.0)
             else:
-                row.append(haversine(all_coords[i][0], all_coords[i][1], all_coords[j][0], all_coords[j][1]))
+                raw_dist = haversine(all_coords[i][0], all_coords[i][1], all_coords[j][0], all_coords[j][1])
+                multiplier = get_circuity_multiplier(all_addrs[i], all_addrs[j])
+                row.append(raw_dist * multiplier)
         matrix.append(row)
     return matrix
 
