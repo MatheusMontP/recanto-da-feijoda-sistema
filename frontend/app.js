@@ -208,7 +208,8 @@ const App = {
 
             let text = `🍲 RECANTO DA FEIJOADA — Roteiro de Entregas\n`;
             text += `📍 Modo: ${mode}\n`;
-            text += `📏 Distância: ${dist} km | 🥘 Total: ${total} feijoadas\n`;
+            text += `📏 Distância: ~${dist} km (Estimada, sujeita a variação do GPS)\n`;
+            text += `🥘 Total: ${total} feijoadas\n`;
             text += `─────────────────────\n`;
             text += `🏠 ORIGEM: Farolândia, Aracaju\n\n`;
 
@@ -358,7 +359,8 @@ const App = {
                         <h1>RECANTO DA FEIJOADA</h1>
                         <h2>ROTA ${optText}</h2>
                         <div>Data: ${date}</div>
-                        <div>Distância: ${currentDistance.value} km</div>
+                        <div>Dist. Estimada: ~${currentDistance.value} km</div>
+                        <div style="font-size: 0.85em; color: #555; margin-top: 2px;">(Sujeita a variação do GPS e app de mapas)</div>
                     </div>
                     
                     <div class="divider">================================</div>
