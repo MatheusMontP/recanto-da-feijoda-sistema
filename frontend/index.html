@@ -8,1032 +8,894 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;1,14..32,400&display=swap" rel="stylesheet">
 
-    <!-- Vue 3 -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 
     <style>
-        /* ══════════════════════════════════════════
-           DESIGN TOKENS
-           ══════════════════════════════════════════ */
+        /* ─── TOKENS ─────────────────────────────────── */
         :root {
-            /* Brand */
-            --brand-900: #1C0C06;
-            --brand-800: #2C1810;
-            --brand-700: #3D2314;
-            --brand-500: #E07020;
-            --brand-400: #F08840;
-            --brand-300: #F0A030;
-            --brand-100: #FEF3E6;
-            --brand-50:  #FFFAF4;
+            --c-bg:       #F5EFE6;
+            --c-surface:  #FFFFFF;
+            --c-border:   #E5DDD4;
+            --c-border2:  #D4C9BC;
+            --c-txt:      #1A1208;
+            --c-txt-2:    #6B5C4C;
+            --c-txt-3:    #9E8E7E;
+            --c-accent:   #D4621A;
+            --c-accent-h: #B8500E;
+            --c-gold:     #E8930A;
+            --c-dark:     #28150A;
+            --c-dark2:    #3D2210;
+            --c-green:    #16A34A;
+            --c-red:      #DC2626;
+            --c-blue:     #2563EB;
+            --c-cyan:     #0891B2;
 
-            /* Neutrals */
-            --neu-900: #111118;
-            --neu-800: #1E1E2A;
-            --neu-700: #2D2D3A;
-            --neu-500: #6B6B7B;
-            --neu-300: #B8B8C8;
-            --neu-200: #E8E8F0;
-            --neu-100: #F4F4F8;
-            --neu-50:  #FAFAFA;
-            --white:   #FFFFFF;
+            --r-sm:  6px;
+            --r-md:  10px;
+            --r-lg:  14px;
+            --r-xl:  20px;
+            --r-2xl: 28px;
 
-            /* Semantic */
-            --success: #22C55E;
-            --danger:  #EF4444;
-            --info:    #3B82F6;
+            --sh-xs: 0 1px 2px rgba(0,0,0,.05);
+            --sh-sm: 0 1px 3px rgba(0,0,0,.10), 0 1px 2px rgba(0,0,0,.06);
+            --sh-md: 0 4px 6px rgba(0,0,0,.07), 0 2px 4px rgba(0,0,0,.05);
+            --sh-lg: 0 10px 15px rgba(0,0,0,.08), 0 4px 6px rgba(0,0,0,.04);
 
-            /* Typography */
-            --font-sans:  'Inter', system-ui, -apple-system, sans-serif;
-            --font-serif: 'Playfair Display', Georgia, serif;
+            --ease: cubic-bezier(.4,0,.2,1);
+            --spring: cubic-bezier(.34,1.56,.64,1);
 
-            /* Spacing / Radius */
-            --r-sm: 8px;
-            --r-md: 12px;
-            --r-lg: 20px;
-            --r-xl: 32px;
-            --r-full: 9999px;
-
-            /* Shadows */
-            --shadow-xs: 0 1px 2px rgba(0,0,0,0.05);
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1),  0 1px 2px rgba(0,0,0,0.06);
-            --shadow-md: 0 4px 6px rgba(0,0,0,0.07),  0 2px 4px rgba(0,0,0,0.06);
-            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05);
-            --shadow-xl: 0 20px 25px rgba(0,0,0,0.1), 0 10px 10px rgba(0,0,0,0.04);
-
-            /* Animation */
-            --ease: cubic-bezier(0.4, 0, 0.2, 1);
-            --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --nav-h: 56px;
+            --font: 'Inter', system-ui, -apple-system, sans-serif;
         }
 
-        /* Dark mode */
+        /* Dark */
         .dark {
-            --brand-50:  #0E0906;
-            --brand-100: #1A100A;
-            --neu-50:  #111118;
-            --neu-100: #1A1A24;
-            --neu-200: #26263A;
-            --neu-300: #44445A;
-            --neu-500: #8888A0;
-            --neu-700: #C0C0D0;
-            --neu-800: #D8D8E8;
-            --neu-900: #F0F0F8;
-            --white:   #1A1A24;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
-            --shadow-md: 0 4px 6px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.3);
-            --shadow-lg: 0 10px 15px rgba(0,0,0,0.4), 0 4px 6px rgba(0,0,0,0.2);
+            --c-bg:      #0F0A06;
+            --c-surface: #1C1208;
+            --c-border:  #2D1E10;
+            --c-border2: #3D2A18;
+            --c-txt:     #F5EFE6;
+            --c-txt-2:   #C4B09C;
+            --c-txt-3:   #7A6A5A;
+            --c-accent:  #E8732A;
+            --c-dark:    #F5EFE6;
+            --c-dark2:   #C4B09C;
         }
-        .dark body { background: var(--neu-50); color: var(--neu-900); }
-        .dark .navbar { background: rgba(17, 17, 24, 0.95); border-bottom-color: rgba(255,255,255,0.06); }
-        .dark .card { background: var(--neu-100); border-color: rgba(255,255,255,0.06); }
-        .dark .tip-card { background: rgba(30,20,10,0.8); border-color: rgba(224,112,32,0.15); }
-        .dark .text-input { background: var(--neu-200); border-color: var(--neu-300); color: var(--neu-900); }
-        .dark .text-input::placeholder { color: var(--neu-500); }
-        .dark .counter { background: var(--neu-200); border-color: var(--neu-300); }
-        .dark .counter-btn { color: var(--neu-800); }
-        .dark .order-item { background: var(--neu-200); }
-        .dark .order-item:hover { background: var(--neu-300); }
-        .dark .stop-content { background: var(--neu-200); }
-        .dark .stop-dot { border-color: var(--neu-300); background: var(--neu-100); }
-        .dark .stop-line { background: var(--neu-300); }
-        .dark .empty-state-card { border-color: var(--neu-300); background: var(--neu-100); }
-        .dark .stat-card { background: var(--neu-100); border-color: rgba(255,255,255,0.06); }
-        .dark .toggle-pill-track { background: var(--neu-200); }
-        .dark .pill-inner { color: var(--neu-800); }
-        .dark .pill-inner.active { background: var(--white); color: var(--neu-900); }
-        .dark .error-banner { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.2); }
-        .dark .badge { background: var(--neu-300); color: var(--neu-800); }
-        .dark .btn-secondary { border-color: var(--neu-300); color: var(--neu-800); }
-        .dark .btn-secondary:hover { background: var(--neu-300); }
+        .dark .navbar { background: rgba(15,10,6,.97); border-bottom-color: rgba(255,255,255,.06); }
+        .dark .card   { background: var(--c-surface); border-color: var(--c-border); }
+        .dark .text-input { background: #150E06; border-color: var(--c-border2); color: var(--c-txt); }
+        .dark .counter    { background: #150E06; border-color: var(--c-border2); }
+        .dark .order-row  { background: #140E08; }
+        .dark .order-row:hover { background: #1F150C; }
+        .dark .stop-pill  { background: #140E08; }
+        .dark .stat-card  { background: var(--c-surface); border-color: var(--c-border); }
+        .dark .segment-track { background: var(--c-border); }
+        .dark .seg-btn.seg-active { background: var(--c-surface); }
+        .dark .export-btn { border-color: rgba(255,255,255,.12); color: rgba(255,255,255,.65); }
+        .dark .export-btn:hover { border-color: rgba(255,255,255,.28); color: #fff; background: rgba(255,255,255,.06); }
+        .dark .empty-card { border-color: var(--c-border2); background: var(--c-surface); }
+        .dark .tip-box    { background: rgba(212,98,26,.07); border-color: rgba(212,98,26,.18); }
+        .dark .btn-ghost  { border-color: var(--c-border2); color: var(--c-txt-2); }
+        .dark .btn-ghost:hover { background: var(--c-border); }
 
-        /* ── Reset ── */
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        html, body { overflow-x: hidden; width: 100%; }
-        html { scroll-behavior: smooth; font-size: 16px; }
+        /* ─── RESET ──────────────────────────────────── */
+        *,*::before,*::after { box-sizing: border-box; margin:0; padding:0; }
+        html,body { overflow-x:hidden; height:100%; }
+        html { font-size:16px; scroll-behavior:smooth; }
         body {
-            font-family: var(--font-sans);
-            background: var(--brand-50);
-            color: var(--neu-900);
-            line-height: 1.6;
-            min-height: 100vh;
+            font-family: var(--font);
+            background: var(--c-bg);
+            color: var(--c-txt);
             -webkit-font-smoothing: antialiased;
+            min-height: 100dvh;
         }
-        img { display: block; max-width: 100%; }
         button { font-family: inherit; cursor: pointer; border: none; background: none; }
         input[type=number]::-webkit-inner-spin-button,
-        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-        input[type=number] { -moz-appearance: textfield; }
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--neu-300); border-radius: 3px; }
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
+        input[type=number] { -moz-appearance:textfield; }
+        img { display:block; max-width:100%; }
 
-        /* ── Layout ── */
-        .container { max-width: 1120px; margin: 0 auto; padding: 0 1.5rem; }
+        /* ─── SCROLLBAR ──────────────────────────────── */
+        ::-webkit-scrollbar { width:4px; height:4px; }
+        ::-webkit-scrollbar-track { background:transparent; }
+        ::-webkit-scrollbar-thumb { background:var(--c-border2); border-radius:2px; }
 
-        /* ══ NAVBAR ══ */
+        /* ─── LAYOUT ─────────────────────────────────── */
+        .app-shell {
+            display: flex;
+            flex-direction: column;
+            height: 100dvh;
+            overflow: hidden;
+        }
+
+        /* ─── NAVBAR ─────────────────────────────────── */
         .navbar {
-            position: sticky; top: 0; z-index: 100;
-            background: rgba(28, 12, 6, 0.96);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border-bottom: 1px solid rgba(255,255,255,0.07);
+            flex-shrink: 0;
+            height: var(--nav-h);
+            background: var(--c-dark);
+            border-bottom: 1px solid rgba(255,255,255,.07);
+            display: flex;
+            align-items: center;
+            padding: 0 1.25rem;
+            gap: 0.75rem;
+            z-index: 50;
         }
-        .nav-inner {
-            height: 60px;
-            display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+        .nav-logo {
+            width: 34px; height: 34px; border-radius: 8px; overflow: hidden;
+            border: 1.5px solid rgba(255,255,255,.12); flex-shrink: 0;
         }
-        .nav-brand { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; }
-        .nav-logo-wrap {
-            width: 38px; height: 38px; border-radius: 10px; overflow: hidden;
-            border: 1.5px solid rgba(240,160,48,0.3); flex-shrink: 0;
-        }
-        .nav-logo-img { width: 100%; height: 100%; object-fit: cover; }
+        .nav-logo img { width:100%; height:100%; object-fit:cover; }
         .nav-title {
-            font-family: var(--font-serif);
-            font-size: 1.15rem; font-weight: 700; color: #fff;
-            letter-spacing: -0.01em;
+            font-size: .9rem; font-weight: 700; color: #fff;
+            letter-spacing: -.01em;
         }
-        .nav-title span { color: var(--brand-300); }
-        .nav-badge {
-            font-size: 0.62rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
-            background: rgba(224,112,32,0.15); color: var(--brand-400);
-            padding: 0.2rem 0.55rem; border-radius: var(--r-full);
-            border: 1px solid rgba(224,112,32,0.2);
+        .nav-title span { color: var(--c-gold); }
+        .nav-pill {
+            font-size: .6rem; font-weight: 700; letter-spacing: .1em;
+            text-transform: uppercase;
+            background: rgba(232,147,10,.15);
+            color: var(--c-gold);
+            padding: .2rem .55rem; border-radius: 99px;
+            border: 1px solid rgba(232,147,10,.2);
         }
-        .nav-right { display: flex; align-items: center; gap: 0.5rem; }
-        .nav-chip {
-            display: flex; align-items: center; gap: 0.5rem;
-            background: rgba(255,255,255,0.06); border-radius: var(--r-full);
-            padding: 0.3rem 0.9rem 0.3rem 0.45rem;
-            border: 1px solid rgba(255,255,255,0.08);
+        .nav-spacer { flex: 1; }
+        .nav-origin {
+            display: flex; align-items: center; gap: .45rem;
+            background: rgba(255,255,255,.06);
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 99px;
+            padding: .25rem .7rem .25rem .35rem;
         }
-        .nav-chip-img { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; }
-        .nav-chip-text { font-size: 0.78rem; color: rgba(255,255,255,0.7); font-weight: 500; }
-        .dark-toggle {
-            width: 34px; height: 34px; border-radius: 8px;
-            display: flex; align-items: center; justify-content: center;
-            background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
-            transition: background 0.2s, transform 0.2s;
+        .nav-origin img { width:22px; height:22px; border-radius:50%; object-fit:cover; }
+        .nav-origin-text { font-size:.72rem; color:rgba(255,255,255,.65); font-weight:500; }
+        .dark-btn {
+            width:32px; height:32px; border-radius:8px;
+            display:flex; align-items:center; justify-content:center;
+            background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08);
+            color:var(--c-gold); transition:background .15s;
         }
-        .dark-toggle:hover { background: rgba(255,255,255,0.12); transform: scale(1.05); }
-        .dark-toggle svg { color: var(--brand-300); }
+        .dark-btn:hover { background:rgba(255,255,255,.12); }
 
-        /* ══ HERO / PAGE HEADER ══ */
-        .page-hero {
-            background: linear-gradient(135deg, var(--brand-800) 0%, #4a2010 50%, #6b350f 100%);
-            padding: 2.5rem 0 3rem;
-            position: relative; overflow: hidden;
-        }
-        .page-hero::before {
-            content: ''; position: absolute; inset: 0;
-            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-            pointer-events: none;
-        }
-        .page-hero::after {
-            content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 40px;
-            background: var(--brand-50);
-            clip-path: ellipse(55% 100% at 50% 100%);
-            pointer-events: none;
-        }
-        .dark .page-hero::after { background: var(--neu-50); }
-        .hero-inner {
-            position: relative; z-index: 1;
-            text-align: center;
-        }
-        .hero-tag {
-            display: inline-flex; align-items: center; gap: 0.35rem;
-            background: rgba(240,160,48,0.15); border: 1px solid rgba(240,160,48,0.25);
-            border-radius: var(--r-full);
-            padding: 0.3rem 0.85rem;
-            font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 0.1em; color: var(--brand-300);
-            margin-bottom: 1rem;
-        }
-        .hero-tag::before { content: '●'; font-size: 0.5rem; animation: pulse 2s infinite; }
-        @keyframes pulse { 0%,100% { opacity:1 } 50% { opacity:0.4 } }
-        .hero-title {
-            font-family: var(--font-serif);
-            font-size: clamp(1.8rem, 5vw, 2.8rem);
-            font-weight: 800; color: #fff;
-            letter-spacing: -0.02em; line-height: 1.1;
-            margin-bottom: 0.75rem;
-        }
-        .hero-title span { color: var(--brand-300); }
-        .hero-sub {
-            font-size: 0.95rem; color: rgba(255,255,255,0.55);
-            max-width: 480px; margin: 0 auto;
-        }
-
-        /* ══ MAIN GRID ══ */
-        .main-grid {
+        /* ─── WORKSPACE ──────────────────────────────── */
+        .workspace {
+            flex: 1;
+            overflow: hidden;
             display: grid;
-            grid-template-columns: 400px 1fr;
-            gap: 2rem;
-            padding: 2rem 0 5rem;
-            align-items: start;
+            grid-template-columns: 360px 1fr;
+            gap: 0;
         }
 
-        /* ══ CARD ══ */
-        .card {
-            background: var(--white);
-            border-radius: var(--r-lg);
-            padding: 1.5rem;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid rgba(0,0,0,0.06);
+        /* ─── LEFT PANE ──────────────────────────────── */
+        .left-pane {
+            border-right: 1px solid var(--c-border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: var(--c-surface);
         }
-        .card + .card { margin-top: 1rem; }
-        .sidebar { display: flex; flex-direction: column; gap: 1rem; }
+        .pane-header {
+            flex-shrink: 0;
+            padding: .85rem 1.1rem .6rem;
+            border-bottom: 1px solid var(--c-border);
+        }
+        .pane-title {
+            font-size: .72rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: .1em; color: var(--c-txt-3);
+        }
 
-        .card-header {
-            display: flex; align-items: center; gap: 0.6rem;
-            margin-bottom: 1.25rem;
-        }
-        .card-icon {
-            width: 32px; height: 32px; border-radius: 8px;
-            background: linear-gradient(135deg, var(--brand-500), var(--brand-300));
-            display: flex; align-items: center; justify-content: center;
+        /* Tip */
+        .tip-box {
+            margin: .75rem .75rem 0;
+            background: rgba(212,98,26,.05);
+            border: 1px solid rgba(212,98,26,.12);
+            border-radius: var(--r-md);
+            padding: .7rem .85rem;
+            display: flex; gap: .6rem;
             flex-shrink: 0;
         }
-        .card-icon svg { color: #fff; }
-        .card-title {
-            font-size: 0.95rem; font-weight: 700;
-            color: var(--neu-900); letter-spacing: -0.01em;
-        }
-        .card-sub { font-size: 0.75rem; color: var(--neu-500); margin-top: 0.1rem; }
+        .tip-dot { width:18px; height:18px; flex-shrink:0; color:var(--c-accent); margin-top:1px; }
+        .tip-text { font-size:.72rem; color:var(--c-txt-2); line-height:1.5; }
+        .tip-text b { color:var(--c-txt); font-weight:600; }
 
-        /* ══ TIP CARD ══ */
-        .tip-card {
-            background: linear-gradient(135deg, rgba(254,243,230,0.9), rgba(255,250,244,0.9));
-            border: 1px solid rgba(224,112,32,0.15);
-            border-radius: var(--r-lg); padding: 1.25rem;
-            display: flex; gap: 0.75rem;
+        /* Form */
+        .form-section {
+            flex-shrink: 0;
+            padding: .75rem .75rem 0;
         }
-        .tip-icon-wrap {
-            width: 36px; height: 36px; border-radius: 10px;
-            background: rgba(224,112,32,0.1); border: 1px solid rgba(224,112,32,0.15);
-            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-        }
-        .tip-title { font-size: 0.82rem; font-weight: 700; color: var(--brand-800); margin-bottom: 0.5rem; }
-        .tip-list { list-style: none; display: flex; flex-direction: column; gap: 0.4rem; }
-        .tip-list li {
-            font-size: 0.78rem; color: var(--neu-500); line-height: 1.5;
-            display: flex; gap: 0.4rem; align-items: flex-start;
-        }
-        .tip-list li::before {
-            content: '→';
-            color: var(--brand-500); font-weight: 700; flex-shrink: 0; margin-top: 0.05rem;
-        }
-        .tip-list b { color: var(--brand-700); font-weight: 600; }
-
-        /* ══ FORM ══ */
-        .form-stack { display: flex; flex-direction: column; gap: 0.85rem; }
         .field-label {
-            display: block; font-size: 0.76rem; font-weight: 600;
-            color: var(--neu-700); margin-bottom: 0.35rem; letter-spacing: 0.01em;
+            display: block; font-size: .7rem; font-weight: 600;
+            color: var(--c-txt-3); margin-bottom: .3rem; letter-spacing:.02em;
         }
         .text-input {
-            width: 100%; padding: 0.75rem 0.9rem;
-            border: 1.5px solid var(--neu-200); border-radius: var(--r-md);
-            font-family: var(--font-sans); font-size: 16px;
-            color: var(--neu-900); background: var(--neu-50);
-            transition: border-color 0.15s, box-shadow 0.15s;
-            outline: none;
+            width: 100%; padding: .6rem .75rem;
+            border: 1.5px solid var(--c-border2);
+            border-radius: var(--r-md);
+            font-family: var(--font); font-size: 16px;
+            color: var(--c-txt); background: var(--c-bg);
+            outline: none; transition: border-color .15s, box-shadow .15s;
         }
-        .text-input::placeholder { color: var(--neu-300); }
-        .text-input:focus { border-color: var(--brand-500); box-shadow: 0 0 0 3px rgba(224,112,32,0.12); background: var(--white); }
+        .text-input::placeholder { color: var(--c-txt-3); }
+        .text-input:focus { border-color: var(--c-accent); box-shadow: 0 0 0 3px rgba(212,98,26,.12); }
+        .field-gap { margin-top: .5rem; }
 
-        /* ══ COUNTER ══ */
-        .qty-row { display: flex; align-items: center; gap: 0.75rem; }
-        .qty-label-wrap { flex: 1; }
+        .qty-row {
+            display: flex; gap: .6rem; align-items: flex-end; margin-top: .5rem;
+        }
         .counter {
             display: flex; align-items: center;
-            border: 1.5px solid var(--neu-200); border-radius: var(--r-md);
-            overflow: hidden; background: var(--white); height: 46px;
+            border: 1.5px solid var(--c-border2); border-radius: var(--r-md);
+            background: var(--c-bg); height: 40px; overflow: hidden;
         }
         .counter-btn {
-            width: 46px; height: 46px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.25rem; font-weight: 500; color: var(--neu-700);
-            transition: background 0.15s, color 0.15s; flex-shrink: 0;
+            width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; color: var(--c-txt-2);
+            transition: background .12s, color .12s;
         }
-        .counter-btn:hover { background: var(--brand-500); color: #fff; }
-        .counter-btn:active { transform: scale(0.9); }
+        .counter-btn:hover { background: var(--c-accent); color: #fff; }
         .counter-val {
-            min-width: 44px; text-align: center;
-            font-size: 1rem; font-weight: 700; color: var(--neu-900);
-            background: transparent; border: none;
-            font-family: var(--font-sans);
+            min-width: 36px; text-align: center;
+            font-size: .9rem; font-weight: 700;
+            background: transparent; border: none; font-family: var(--font);
         }
-
-        /* ══ BUTTONS ══ */
-        .btn {
-            display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem;
-            padding: 0.7rem 1.2rem; border-radius: var(--r-md);
-            font-size: 0.875rem; font-weight: 600; letter-spacing: -0.01em;
-            transition: all 0.15s var(--ease);
-            cursor: pointer; border: 1.5px solid transparent;
-            white-space: nowrap; outline: none;
+        .btn-add {
+            flex: 1; height: 40px;
+            display: flex; align-items: center; justify-content: center; gap: .35rem;
+            background: var(--c-accent); color: #fff;
+            border-radius: var(--r-md); font-size: .83rem; font-weight: 600;
+            border: none; transition: background .15s, transform .1s, box-shadow .15s;
         }
-        .btn:active { transform: scale(0.97); }
-        .btn-primary {
-            background: var(--brand-500); color: #fff; border-color: var(--brand-500);
-        }
-        .btn-primary:hover { background: #C85E10; box-shadow: 0 4px 14px rgba(224,112,32,0.35); transform: translateY(-1px); }
-        .btn-primary:disabled { background: var(--neu-200); color: var(--neu-500); border-color: var(--neu-200); cursor: not-allowed; transform: none; box-shadow: none; }
+        .btn-add:hover { background: var(--c-accent-h); box-shadow: 0 4px 12px rgba(212,98,26,.3); }
+        .btn-add:active { transform: scale(.97); }
+        .btn-add:disabled { background: var(--c-border2); color: var(--c-txt-3); cursor: not-allowed; }
 
-        .btn-block {
-            width: 100%; padding: 0.85rem;
-            background: linear-gradient(135deg, var(--brand-800), var(--brand-700));
-            color: #fff; border-color: transparent;
-            border-radius: var(--r-md); font-size: 0.9rem; font-weight: 700;
-            box-shadow: 0 4px 14px rgba(44,24,16,0.3);
-        }
-        .btn-block:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(44,24,16,0.35); }
-        .btn-block:disabled { background: var(--neu-200); color: var(--neu-500); cursor: not-allowed; transform: none; box-shadow: none; }
-
-        .btn-secondary {
-            background: transparent; color: var(--neu-700);
-            border: 1.5px solid var(--neu-200);
-        }
-        .btn-secondary:hover { background: var(--neu-100); border-color: var(--neu-300); }
-
-        .btn-danger-ghost { color: var(--danger); background: transparent; border: none; }
-        .btn-danger-ghost:hover { background: rgba(239,68,68,0.08); }
-
-        /* ══ ORDER LIST ══ */
+        /* Order list */
         .order-list-header {
-            display: flex; align-items: center; justify-content: space-between;
-            margin-bottom: 0.85rem;
+            flex-shrink: 0;
+            display: flex; align-items: center;
+            padding: .65rem .75rem .45rem;
+            gap: .5rem;
         }
+        .order-list-title { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--c-txt-3); flex:1; }
         .badge {
-            font-size: 0.72rem; font-weight: 700;
-            background: var(--neu-100); color: var(--neu-500);
-            padding: 0.2rem 0.6rem; border-radius: var(--r-full);
+            font-size: .65rem; font-weight: 700;
+            padding: .15rem .55rem; border-radius: 99px;
+            background: var(--c-border); color: var(--c-txt-2);
         }
-        .badge-orange { background: rgba(224,112,32,0.1); color: var(--brand-500); }
+        .badge-accent { background: rgba(212,98,26,.12); color: var(--c-accent); }
+        .btn-ghost {
+            font-size: .7rem; font-weight: 500; color: var(--c-txt-3);
+            padding: .2rem .5rem; border-radius: var(--r-sm);
+            border: 1px solid var(--c-border);
+            transition: all .12s;
+        }
+        .btn-ghost:hover { background: var(--c-border); color: var(--c-txt-2); }
 
-        .order-item {
-            display: flex; align-items: center; gap: 0.65rem;
-            padding: 0.8rem; border-radius: var(--r-md);
-            background: var(--neu-50); border: 1px solid transparent;
-            margin-bottom: 0.4rem;
-            animation: slideIn 0.25s var(--ease-spring) both;
-            transition: background 0.15s, border-color 0.15s;
+        .order-scroll {
+            flex: 1; overflow-y: auto; padding: 0 .75rem;
+            min-height: 0;
         }
-        .order-item:hover { background: var(--neu-100); border-color: var(--neu-200); }
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(10px) scale(0.97); }
-            to   { opacity: 1; transform: translateX(0) scale(1); }
+        .order-row {
+            display: flex; align-items: center; gap: .55rem;
+            padding: .55rem .65rem; border-radius: var(--r-md);
+            background: var(--c-bg); margin-bottom: .35rem;
+            animation: rowIn .22s var(--spring) both;
+            transition: background .12s;
+        }
+        .order-row:hover { background: #EDE5D9; }
+        @keyframes rowIn {
+            from { opacity:0; transform:translateX(8px) scale(.97); }
+            to   { opacity:1; transform:none; }
         }
         .order-num {
-            width: 26px; height: 26px; border-radius: 8px; flex-shrink: 0;
-            background: var(--brand-800); color: #fff;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 0.72rem; font-weight: 700;
+            width:22px; height:22px; border-radius:6px; flex-shrink:0;
+            background: var(--c-dark); color:#fff;
+            display:flex; align-items:center; justify-content:center;
+            font-size:.65rem; font-weight:700;
         }
-        .order-info { flex: 1; min-width: 0; }
-        .order-addr {
-            font-size: 0.84rem; font-weight: 500; color: var(--neu-900);
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        .order-info { flex:1; min-width:0; }
+        .order-addr { font-size:.78rem; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .order-meta { font-size:.7rem; color:var(--c-accent); font-weight:600; margin-top:.05rem; }
+        .order-sub  { font-size:.67rem; color:var(--c-txt-3); margin-top:.02rem; }
+        .row-actions { display:flex; gap:1px; flex-shrink:0; }
+        .act-btn {
+            width:26px; height:26px; border-radius:6px;
+            display:flex; align-items:center; justify-content:center;
+            color: var(--c-txt-3); transition: all .12s;
         }
-        .order-complement { font-size: 0.73rem; color: var(--neu-500); margin-top: 0.1rem; }
-        .order-qty { font-size: 0.72rem; color: var(--brand-500); font-weight: 700; margin-top: 0.05rem; }
-        .order-actions { display: flex; align-items: center; gap: 1px; flex-shrink: 0; }
-        .action-btn {
-            width: 30px; height: 30px; border-radius: 7px;
-            display: flex; align-items: center; justify-content: center;
-            color: var(--neu-400); font-size: 0.8rem;
-            transition: all 0.12s; background: transparent;
-        }
-        .action-btn:hover { color: var(--brand-500); background: rgba(224,112,32,0.08); }
-        .action-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-        .action-btn:disabled:hover { color: var(--neu-400); background: transparent; }
-        .action-btn-danger:hover { color: var(--danger); background: rgba(239,68,68,0.08); }
+        .act-btn:hover { color:var(--c-accent); background:rgba(212,98,26,.08); }
+        .act-btn:disabled { opacity:.3; cursor:not-allowed; }
+        .act-btn:disabled:hover { background:transparent; color:var(--c-txt-3); }
+        .act-btn-danger:hover { color:var(--c-red); background:rgba(220,38,38,.08); }
 
-        .empty-state {
-            text-align: center; padding: 2.5rem 1rem; color: var(--neu-400);
+        /* Edit inline */
+        .edit-block { width:100%; display:flex; flex-direction:column; gap:.4rem; }
+        .edit-row { display:flex; gap:.4rem; align-items:center; }
+        .btn-save {
+            height:36px; padding:0 .75rem; border-radius:var(--r-md);
+            background:var(--c-accent); color:#fff;
+            font-size:.78rem; font-weight:600;
+            transition:background .12s;
         }
-        .empty-state svg { margin: 0 auto 0.75rem; opacity: 0.5; }
-        .empty-state p { font-size: 0.83rem; }
+        .btn-save:hover { background:var(--c-accent-h); }
 
-        /* ══ GENERATE BUTTON AREA ══ */
-        .generate-wrap { padding-top: 0.75rem; }
-        .progress-tip { font-size: 0.72rem; color: var(--neu-500); text-align: center; margin-top: 0.6rem; }
-
-        /* ══ RIGHT PANEL ══ */
-        .results-panel { display: flex; flex-direction: column; gap: 1.25rem; }
-
-        /* Empty / Processing */
-        .empty-state-card {
-            background: var(--white); border: 2px dashed var(--neu-200);
-            border-radius: var(--r-lg); padding: 5rem 2rem;
-            text-align: center; color: var(--neu-400);
+        /* Empty */
+        .empty-order {
+            text-align:center; padding:1.5rem .5rem;
+            color:var(--c-txt-3);
         }
-        .empty-state-card svg { margin: 0 auto 1rem; opacity: 0.35; }
-        .empty-state-card h3 { font-family: var(--font-serif); font-size: 1.25rem; color: var(--neu-700); font-weight: 700; margin-bottom: 0.5rem; }
-        .empty-state-card p { font-size: 0.85rem; color: var(--neu-400); max-width: 260px; margin: 0 auto; line-height: 1.5; }
+        .empty-order svg { margin:0 auto .5rem; opacity:.4; }
+        .empty-order p { font-size:.78rem; }
 
-        .processing-card {
-            background: var(--white); border-radius: var(--r-lg);
-            border: 1px solid rgba(0,0,0,0.06);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding: 5rem 2rem; gap: 1.25rem;
+        /* Generate Footer */
+        .gen-footer {
+            flex-shrink: 0;
+            padding: .65rem .75rem;
+            border-top: 1px solid var(--c-border);
         }
-        .spinner {
-            width: 44px; height: 44px;
-            border: 3px solid var(--neu-200); border-top-color: var(--brand-500);
-            border-radius: 50%; animation: spin 1s linear infinite;
+        .btn-generate {
+            width:100%; height:42px;
+            display:flex; align-items:center; justify-content:center; gap:.5rem;
+            background: linear-gradient(135deg, var(--c-dark) 0%, var(--c-dark2) 100%);
+            color:#fff; border-radius:var(--r-md);
+            font-size:.875rem; font-weight:700;
+            border:none; transition:opacity .15s, transform .15s, box-shadow .15s;
+            box-shadow: 0 2px 8px rgba(40,21,10,.25);
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .processing-card h3 { font-weight: 700; color: var(--neu-900); font-size: 1rem; }
-        .processing-card p { font-size: 0.83rem; color: var(--neu-500); text-align: center; max-width: 260px; }
+        .btn-generate:hover:not(:disabled) { box-shadow:0 4px 16px rgba(40,21,10,.35); transform:translateY(-1px); }
+        .btn-generate:disabled { opacity:.45; cursor:not-allowed; transform:none; box-shadow:none; }
+        .btn-generate .spin { animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform:rotate(360deg); } }
 
-        /* Stats */
-        .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+        /* ─── RIGHT PANE ─────────────────────────────── */
+        .right-pane {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: var(--c-bg);
+        }
+
+        /* Empty / processing */
+        .center-state {
+            flex:1; display:flex; align-items:center; justify-content:center;
+            flex-direction:column; text-align:center; gap:1rem;
+            padding:2rem;
+        }
+        .empty-card {
+            border:2px dashed var(--c-border2); border-radius:var(--r-2xl);
+            padding:3rem 2rem; text-align:center;
+            max-width:320px; width:100%;
+        }
+        .empty-card svg { margin:0 auto .85rem; opacity:.3; }
+        .empty-card h3 { font-size:1rem; font-weight:700; color:var(--c-txt-2); margin-bottom:.35rem; }
+        .empty-card p  { font-size:.8rem; color:var(--c-txt-3); line-height:1.5; }
+        .spinner { width:38px;height:38px; border:3px solid var(--c-border2); border-top-color:var(--c-accent); border-radius:50%; animation:spin 1s linear infinite; }
+
+        /* Results */
+        .results-layout {
+            flex:1;
+            display:flex;
+            flex-direction:column;
+            overflow:hidden;
+            padding:.75rem;
+            gap:.65rem;
+        }
+
+        /* Stats Row */
+        .stats-row {
+            flex-shrink:0;
+            display:grid; grid-template-columns:repeat(3,1fr); gap:.65rem;
+        }
         .stat-card {
-            background: var(--white); border-radius: var(--r-lg); padding: 1.25rem;
-            border: 1px solid rgba(0,0,0,0.06); box-shadow: var(--shadow-xs);
-            text-align: center;
+            background:var(--c-surface); border:1px solid var(--c-border);
+            border-radius:var(--r-lg); padding:.85rem 1rem;
+            display:flex; align-items:center; gap:.75rem;
+            box-shadow:var(--sh-xs);
         }
-        .stat-icon-wrap {
-            width: 36px; height: 36px; border-radius: 9px;
-            background: rgba(224,112,32,0.1);
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 0.6rem;
+        .stat-icon {
+            width:34px; height:34px; border-radius:9px; flex-shrink:0;
+            background:rgba(212,98,26,.1);
+            display:flex; align-items:center; justify-content:center;
         }
-        .stat-icon-wrap svg { color: var(--brand-500); }
-        .stat-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--neu-500); font-weight: 600; margin-bottom: 0.2rem; }
-        .stat-value { font-family: var(--font-serif); font-size: 1.75rem; font-weight: 700; color: var(--neu-900); line-height: 1.1; }
-        .stat-unit { font-size: 0.8rem; font-weight: 500; color: var(--brand-500); }
+        .stat-icon svg { color:var(--c-accent); }
+        .stat-label { font-size:.65rem; text-transform:uppercase; letter-spacing:.1em; color:var(--c-txt-3); font-weight:600; }
+        .stat-val   { font-size:1.4rem; font-weight:800; color:var(--c-txt); letter-spacing:-.02em; line-height:1.1; }
+        .stat-unit  { font-size:.75rem; font-weight:500; color:var(--c-accent); }
 
-        /* Toggle Pill */
-        .toggle-bar {
-            background: var(--white); border-radius: var(--r-lg); padding: 1rem 1.25rem;
-            display: flex; align-items: center; justify-content: space-between; gap: 1rem;
-            border: 1px solid rgba(0,0,0,0.06); box-shadow: var(--shadow-xs);
+        /* Toggle */
+        .toggle-row {
+            flex-shrink:0;
+            display:flex; align-items:center; justify-content:space-between; gap:1rem;
+            background:var(--c-surface); border:1px solid var(--c-border);
+            border-radius:var(--r-lg); padding:.65rem 1rem;
+            box-shadow:var(--sh-xs);
         }
-        .toggle-info-title { font-size: 0.88rem; font-weight: 700; color: var(--neu-900); }
-        .toggle-info-sub { font-size: 0.73rem; color: var(--neu-500); margin-top: 0.1rem; }
-        .toggle-pill-track {
-            display: flex; background: var(--neu-100); border-radius: var(--r-full);
-            padding: 3px; gap: 2px; flex-shrink: 0;
+        .toggle-label { font-size:.78rem; font-weight:600; color:var(--c-txt); }
+        .toggle-sub   { font-size:.68rem; color:var(--c-txt-3); margin-top:.1rem; }
+        .segment-track {
+            display:flex; background:var(--c-border); border-radius:99px; padding:2px; gap:2px;
         }
-        .pill-inner {
-            padding: 0.4rem 1rem; border-radius: var(--r-full);
-            font-size: 0.78rem; font-weight: 600; color: var(--neu-500);
-            transition: all 0.2s var(--ease); display: flex; align-items: center; gap: 0.3rem;
+        .seg-btn {
+            padding:.3rem .85rem; border-radius:99px;
+            font-size:.75rem; font-weight:600; color:var(--c-txt-3);
+            transition:all .2s var(--ease);
+            display:flex; align-items:center; gap:.3rem;
         }
-        .pill-inner.active { background: var(--white); color: var(--neu-800); box-shadow: var(--shadow-sm); }
-        .pill-inner.active-opt { background: var(--brand-500); color: #fff; box-shadow: 0 2px 8px rgba(224,112,32,0.3); }
+        .seg-btn.seg-active { background:var(--c-surface); color:var(--c-txt); box-shadow:var(--sh-sm); }
+        .seg-btn.seg-opt    { background:var(--c-accent); color:#fff; box-shadow:0 2px 6px rgba(212,98,26,.3); }
 
-        /* Route Timeline */
-        .timeline-card {
-            background: var(--white); border-radius: var(--r-lg); padding: 1.5rem;
-            border: 1px solid rgba(0,0,0,0.06); box-shadow: var(--shadow-xs);
-            overflow-y: auto; max-height: 560px;
+        /* Error Banner */
+        .err-bar {
+            flex-shrink:0;
+            background:rgba(220,38,38,.06); border:1.5px solid rgba(220,38,38,.18);
+            border-radius:var(--r-md); padding:.7rem .9rem;
+            display:flex; gap:.65rem; align-items:flex-start;
+            font-size:.78rem;
         }
-        .origin-row { display: flex; align-items: flex-start; gap: 0.85rem; margin-bottom: 1.25rem; }
-        .origin-dot {
-            width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
-            background: linear-gradient(135deg, var(--brand-500), var(--brand-300));
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 0 0 4px rgba(224,112,32,0.15);
-        }
-        .origin-dot svg { color: #fff; }
-        .origin-eyebrow { font-size: 0.63rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--brand-500); font-weight: 700; }
-        .origin-name { font-weight: 700; color: var(--neu-900); font-size: 0.95rem; }
-        .origin-sub { font-size: 0.75rem; color: var(--neu-500); }
-        .origin-line { width: 2px; background: linear-gradient(var(--brand-500), var(--neu-200)); margin: 0.4rem auto 0; height: 18px; border-radius: 2px; }
+        .err-bar svg { color:var(--c-red); flex-shrink:0; margin-top:1px; }
+        .err-bar strong { display:block; color:var(--c-red); font-size:.82rem; }
+        .err-bar p { color:#9a4040; margin-top:.15rem; font-size:.75rem; }
 
-        .stop-row { display: flex; align-items: flex-start; gap: 0.85rem; padding-bottom: 1rem; }
-        .stop-track { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; width: 34px; }
-        .stop-dot {
-            width: 11px; height: 11px; border-radius: 50%;
-            border: 2px solid var(--neu-300); background: var(--white);
-            transition: border-color 0.15s, background 0.15s;
+        /* Timeline */
+        .timeline-wrap {
+            flex:1; overflow-y:auto; min-height:0;
+            background:var(--c-surface); border:1px solid var(--c-border);
+            border-radius:var(--r-lg); padding:.85rem 1rem;
+            box-shadow:var(--sh-xs);
         }
-        .stop-row:hover .stop-dot { border-color: var(--brand-500); background: rgba(224,112,32,0.1); }
-        .stop-line { flex: 1; width: 2px; background: var(--neu-200); margin-top: 4px; border-radius: 2px; min-height: 18px; }
-        .stop-content {
-            flex: 1; min-width: 0;
-            background: var(--neu-50); padding: 0.85rem 1rem; border-radius: var(--r-md);
-            display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem;
-            border: 1px solid transparent;
-            transition: background 0.15s, border-color 0.15s;
-        }
-        .stop-row:hover .stop-content { background: rgba(224,112,32,0.04); border-color: rgba(224,112,32,0.12); }
-        .stop-badge { font-size: 0.63rem; font-weight: 700; color: var(--neu-400); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.15rem; }
-        .stop-addr { font-size: 0.88rem; font-weight: 500; color: var(--neu-900); word-break: break-word; }
-        .stop-complement { font-size: 0.73rem; color: var(--neu-500); margin-top: 0.15rem; }
-        .stop-qty-box {
-            background: var(--white); border: 1.5px solid rgba(224,112,32,0.15);
-            border-radius: var(--r-md); padding: 0.4rem 0.65rem;
-            text-align: center; flex-shrink: 0; min-width: 50px;
-        }
-        .stop-qty-num { font-family: var(--font-serif); font-size: 1.2rem; font-weight: 700; color: var(--brand-500); line-height: 1; }
-        .stop-qty-label { font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--neu-400); font-weight: 700; }
 
-        /* ── Error Banner ── */
-        .error-banner {
-            background: rgba(239,68,68,0.06); border: 1.5px solid rgba(239,68,68,0.18);
-            border-radius: var(--r-md); padding: 0.9rem 1rem;
-            display: flex; align-items: flex-start; gap: 0.75rem;
-            word-break: break-word;
+        .origin-row { display:flex; gap:.75rem; align-items:flex-start; margin-bottom:.85rem; }
+        .o-dot {
+            width:32px; height:32px; border-radius:50%; flex-shrink:0;
+            background:linear-gradient(135deg,var(--c-accent),var(--c-gold));
+            display:flex; align-items:center; justify-content:center;
+            box-shadow:0 0 0 4px rgba(212,98,26,.12);
         }
-        .error-banner svg { color: var(--danger); flex-shrink: 0; margin-top: 1px; }
-        .error-banner strong { font-size: 0.85rem; color: var(--danger); display: block; }
-        .error-banner p { font-size: 0.78rem; color: #9a4040; margin-top: 0.2rem; }
+        .o-dot svg { color:#fff; }
+        .o-connector { display:flex; flex-direction:column; align-items:center; flex-shrink:0; width:32px; }
+        .o-line { width:2px; background:linear-gradient(var(--c-accent),var(--c-border2)); height:14px; margin-top:3px; border-radius:2px; }
+        .o-eyebrow { font-size:.6rem; text-transform:uppercase; letter-spacing:.1em; color:var(--c-accent); font-weight:700; }
+        .o-name    { font-size:.88rem; font-weight:700; color:var(--c-txt); }
+        .o-sub     { font-size:.72rem; color:var(--c-txt-3); }
 
-        /* ── Export Bar ── */
-        .export-bar {
-            background: linear-gradient(135deg, var(--brand-800), #3a1c0c);
-            border-radius: var(--r-lg); padding: 1.25rem 1.5rem;
-            display: flex; align-items: center; justify-content: space-between; gap: 1rem;
-            box-shadow: 0 8px 24px rgba(44,24,16,0.25); flex-wrap: wrap;
+        .stop-row { display:flex; gap:.75rem; align-items:flex-start; padding-bottom:.75rem; }
+        .s-track  { display:flex; flex-direction:column; align-items:center; flex-shrink:0; width:32px; }
+        .s-dot    { width:10px; height:10px; border-radius:50%; border:2px solid var(--c-border2); background:var(--c-surface); transition:border-color .15s; }
+        .stop-row:hover .s-dot { border-color:var(--c-accent); }
+        .s-line   { flex:1; width:2px; background:var(--c-border); min-height:14px; margin-top:3px; border-radius:2px; }
+        .stop-pill {
+            flex:1; min-width:0;
+            background:var(--c-bg); border-radius:var(--r-md);
+            padding:.6rem .8rem;
+            display:flex; justify-content:space-between; align-items:flex-start; gap:.65rem;
+            border:1px solid transparent;
+            transition:background .15s, border-color .15s;
         }
-        .export-title { color: #fff; font-weight: 700; font-size: 0.88rem; }
-        .export-sub { color: rgba(255,255,255,0.45); font-size: 0.72rem; margin-top: 0.1rem; }
-        .export-actions { display: flex; gap: 0.45rem; flex-wrap: wrap; }
-        .btn-export {
-            display: inline-flex; align-items: center; gap: 0.4rem;
-            padding: 0.5rem 0.9rem; border-radius: var(--r-md);
-            font-size: 0.78rem; font-weight: 600;
-            border: 1.5px solid rgba(255,255,255,0.15);
-            color: rgba(255,255,255,0.75);
-            background: rgba(255,255,255,0.06);
-            transition: all 0.15s var(--ease);
-            outline: none;
+        .stop-row:hover .stop-pill { background:rgba(212,98,26,.04); border-color:rgba(212,98,26,.1); }
+        .s-badge   { font-size:.6rem; text-transform:uppercase; letter-spacing:.08em; color:var(--c-txt-3); font-weight:700; margin-bottom:.1rem; }
+        .s-addr    { font-size:.83rem; font-weight:500; color:var(--c-txt); word-break:break-word; }
+        .s-comp    { font-size:.7rem; color:var(--c-txt-3); margin-top:.1rem; }
+        .s-qty-box {
+            background:var(--c-surface); border:1.5px solid rgba(212,98,26,.15);
+            border-radius:var(--r-md); padding:.35rem .65rem;
+            text-align:center; flex-shrink:0; min-width:44px;
         }
-        .btn-export:hover { background: rgba(255,255,255,0.12); color: #fff; border-color: rgba(255,255,255,0.3); transform: translateY(-1px); }
-        .btn-export svg { width: 13px; height: 13px; }
-        .btn-export-whatsapp { border-color: rgba(37,211,102,0.4); color: #4CE67A; }
-        .btn-export-whatsapp:hover { background: #25D366; color: #fff; border-color: #25D366; box-shadow: 0 4px 12px rgba(37,211,102,0.25); }
-        .btn-export-gmaps { border-color: rgba(66,133,244,0.4); color: #7BAEFF; }
-        .btn-export-gmaps:hover { background: #4285F4; color: #fff; border-color: #4285F4; box-shadow: 0 4px 12px rgba(66,133,244,0.25); }
-        .btn-export-waze { border-color: rgba(51,204,255,0.4); color: #5DD8FF; }
-        .btn-export-waze:hover { background: #33CCFF; color: #000; border-color: #33CCFF; box-shadow: 0 4px 12px rgba(51,204,255,0.25); }
+        .s-qty-num { font-size:1.1rem; font-weight:800; color:var(--c-accent); line-height:1; }
+        .s-qty-lbl { font-size:.56rem; text-transform:uppercase; letter-spacing:.06em; color:var(--c-txt-3); font-weight:700; }
 
-        /* ── Footer ── */
-        .footer {
-            text-align: center; padding: 2rem 0;
-            font-size: 0.72rem; color: var(--neu-400);
-            border-top: 1px solid var(--neu-200);
+        /* Export Bar */
+        .export-row {
+            flex-shrink:0;
+            background: linear-gradient(135deg, var(--c-dark) 0%, #4D290F 100%);
+            border-radius:var(--r-lg); padding:.75rem 1rem;
+            display:flex; align-items:center; gap:1rem; flex-wrap:wrap;
+            box-shadow:0 4px 16px rgba(40,21,10,.2);
         }
+        .export-label { font-size:.78rem; font-weight:700; color:#fff; flex-shrink:0; }
+        .export-actions { display:flex; gap:.4rem; flex-wrap:wrap; flex:1; }
+        .export-btn {
+            height:32px; padding:0 .75rem;
+            display:inline-flex; align-items:center; gap:.35rem;
+            border:1.5px solid rgba(255,255,255,.15); color:rgba(255,255,255,.65);
+            background:rgba(255,255,255,.05); border-radius:var(--r-md);
+            font-size:.75rem; font-weight:600;
+            transition:all .12s; outline:none;
+        }
+        .export-btn:hover { border-color:rgba(255,255,255,.35); color:#fff; background:rgba(255,255,255,.1); transform:translateY(-1px); }
+        .export-btn svg { width:12px; height:12px; }
+        .eb-wa  { border-color:rgba(37,211,102,.35); color:#4CE67A; }
+        .eb-wa:hover  { background:#25D366; border-color:#25D366; color:#fff; box-shadow:0 4px 10px rgba(37,211,102,.25); }
+        .eb-gm  { border-color:rgba(66,133,244,.35); color:#7BAEFF; }
+        .eb-gm:hover  { background:#4285F4; border-color:#4285F4; color:#fff; box-shadow:0 4px 10px rgba(66,133,244,.25); }
+        .eb-wz  { border-color:rgba(8,145,178,.35); color:#5DD8FF; }
+        .eb-wz:hover  { background:#0891B2; border-color:#0891B2; color:#fff; box-shadow:0 4px 10px rgba(8,145,178,.25); }
 
         /* Toast */
         .toast {
-            position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 300;
-            background: var(--brand-800); color: #fff;
-            padding: 0.75rem 1.25rem; border-radius: var(--r-md);
-            box-shadow: var(--shadow-xl); font-size: 0.83rem; font-weight: 500;
-            display: flex; align-items: center; gap: 0.5rem;
-            animation: toastIn 0.3s var(--ease);
+            position:fixed; bottom:1.25rem; right:1.25rem; z-index:999;
+            background:var(--c-dark); color:#fff;
+            padding:.6rem 1.1rem; border-radius:var(--r-md);
+            font-size:.8rem; font-weight:500;
+            display:flex; align-items:center; gap:.5rem;
+            box-shadow:var(--sh-lg);
+            animation:toastIn .28s var(--ease);
         }
-        .toast svg { color: var(--brand-300); }
-        @keyframes toastIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+        .toast svg { color:var(--c-gold); }
+        @keyframes toastIn { from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none} }
 
-        /* animate-spin utility */
-        .spin { animation: spin 1s linear infinite; }
+        /* Utilities */
+        .sr-only { position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0; }
 
-        /* Geo error list */
-        .geo-errors { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 0; }
+        /* ─── MOBILE ─────────────────────────────────── */
+        @media (max-width: 768px) {
+            :root { --nav-h: 52px; }
 
-        /* Edit inline */
-        .edit-wrap { width: 100%; display: flex; flex-direction: column; gap: 0.5rem; }
-        .edit-actions { display: flex; align-items: center; gap: 0.5rem; }
-
-        /* Dividers */
-        .divider { height: 1px; background: var(--neu-100); margin: 0.5rem 0; }
-
-        /* ══ RESPONSIVE ══ */
-        @media (max-width: 900px) {
-            .main-grid { grid-template-columns: 1fr; }
-            .nav-chip { display: none; }
-            .stats-row { grid-template-columns: repeat(3, 1fr); }
-        }
-
-        @media (max-width: 600px) {
-            .container { padding: 0 0.9rem; }
-            .page-hero { padding: 2rem 0 2.75rem; }
-            .hero-title { font-size: 1.75rem; }
-
-            /* Mobile grid: when results are present put them above */
-            .main-grid {
-                display: flex; flex-direction: column; gap: 1.25rem;
-                padding: 1.25rem 0 4rem;
+            .app-shell { height:auto; min-height:100dvh; overflow:auto; }
+            .workspace  {
+                display: flex;
+                flex-direction: column;
+                overflow: visible;
             }
-            .main-grid.route-generated { flex-direction: column-reverse; }
+            .left-pane {
+                border-right: none;
+                border-bottom: 1px solid var(--c-border);
+            }
+            .order-scroll { max-height: 260px; }
 
-            .sidebar { gap: 0.85rem; }
-            .card { padding: 1.1rem; }
-            .tip-card { padding: 1rem; }
+            /* When results are shown, push right pane to top */
+            .workspace.has-results { flex-direction: column-reverse; }
 
-            /* Full-width submit btn */
-            .qty-row { flex-direction: column; align-items: stretch; }
-            .qty-row .counter { height: 52px; }
-            .qty-row .counter-btn { width: 52px; height: 52px; }
-            .qty-row .btn { width: 100%; padding: 0.95rem; font-size: 0.95rem; }
+            .right-pane { overflow: visible; }
+            .results-layout { overflow: visible; }
+            .timeline-wrap { overflow-y: visible; }
 
-            /* Stats */
-            .stats-row { grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
-            .stat-card { padding: 0.85rem 0.65rem; }
-            .stat-value { font-size: 1.35rem; }
-            .stat-icon-wrap { width: 28px; height: 28px; border-radius: 7px; margin-bottom: 0.4rem; }
-            .stat-label { font-size: 0.62rem; }
+            /* Nav collapse */
+            .nav-origin { display: none; }
+            .nav-pill   { display: none; }
+
+            /* Stats: 3 columns even on mobile */
+            .stats-row { gap: .45rem; }
+            .stat-card { padding: .65rem .7rem; gap: .55rem; }
+            .stat-icon { width:28px; height:28px; border-radius:7px; }
+            .stat-val  { font-size:1.1rem; }
+            .stat-label{ font-size:.6rem; }
 
             /* Toggle */
-            .toggle-bar { flex-direction: column; align-items: stretch; gap: 0.75rem; }
-            .toggle-pill-track { width: 100%; }
-            .pill-inner { flex: 1; justify-content: center; }
-
-            /* Timeline */
-            .timeline-card { padding: 1rem 0.85rem; max-height: none; }
-            .stop-content { padding: 0.75rem 0.85rem; overflow-wrap: break-word; word-break: break-word; }
-            .stop-addr { white-space: normal; }
-            .stop-qty-box { padding: 0.3rem 0.5rem; min-width: 44px; }
-            .stop-qty-num { font-size: 1rem; }
+            .toggle-row { flex-direction:column; align-items:stretch; padding:.6rem .8rem; }
+            .segment-track { width:100%; }
+            .seg-btn { flex:1; justify-content:center; }
 
             /* Export */
-            .export-bar { flex-direction: column; align-items: stretch; padding: 1rem; }
-            .export-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 0.45rem; }
-            .btn-export { justify-content: center; }
+            .export-row { padding:.65rem .8rem; gap:.5rem; }
+            .export-actions { display:grid; grid-template-columns:1fr 1fr; gap:.4rem; }
+            .export-btn { justify-content:center; }
 
             /* Toast */
-            .toast { bottom: 1rem; right: 0.9rem; left: 0.9rem; justify-content: center; }
+            .toast { left:1rem; right:1rem; bottom:1rem; justify-content:center; }
 
-            /* Error */
-            .error-banner { padding: 0.8rem 0.85rem; }
-            .empty-state-card { padding: 3rem 1.5rem; }
+            /* Results layout padding */
+            .results-layout { padding:.65rem; }
         }
 
-        /* Micro utility */
-        .w-full { width: 100%; }
-        .mt-1 { margin-top: 0.5rem; }
-        .text-muted { color: var(--neu-500); font-size: 0.75rem; }
+        @media (min-width: 769px) {
+            .workspace.has-results .left-pane  { /* stays same */ }
+        }
     </style>
 </head>
 
 <body>
-    <div id="app">
+<div id="app" class="app-shell">
 
-        <!-- ══ NAVBAR ══ -->
-        <nav class="navbar">
-            <div class="container nav-inner">
-                <div class="nav-brand">
-                    <div class="nav-logo-wrap">
-                        <img src="./assets/logo.jpg" alt="Logo" class="nav-logo-img">
-                    </div>
-                    <div>
-                        <div class="nav-title">Recanto <span>da Feijoada</span></div>
-                    </div>
-                    <span class="nav-badge">Roteirizador</span>
-                </div>
-                <div class="nav-right">
-                    <div class="nav-chip">
-                        <img src="./assets/logo.jpg" alt="Origem" class="nav-chip-img">
-                        <span class="nav-chip-text">Farolândia, Aracaju</span>
-                    </div>
-                    <button class="dark-toggle" @click="toggleDark" :title="isDark ? 'Modo Claro' : 'Modo Escuro'">
-                        <!-- Sun -->
-                        <svg v-if="isDark" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-                        <!-- Moon -->
-                        <svg v-else xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-                    </button>
-                </div>
-            </div>
-        </nav>
-
-        <!-- ══ HERO ══ -->
-        <div class="page-hero">
-            <div class="container hero-inner">
-                <div class="hero-tag">Sistema Ao Vivo</div>
-                <h1 class="hero-title">Rota Inteligente<br><span>de Entregas</span></h1>
-                <p class="hero-sub">Adicione os pedidos, clique em Gerar Rota e receba a sequência otimizada para o motoboy.</p>
-            </div>
+    <!-- ═══ NAVBAR ════════════════════════════════════ -->
+    <nav class="navbar">
+        <div class="nav-logo">
+            <img src="./assets/logo.jpg" alt="Logo">
         </div>
+        <div class="nav-title">Recanto <span>da Feijoada</span></div>
+        <span class="nav-pill">Roteirizador</span>
+        <div class="nav-spacer"></div>
+        <div class="nav-origin">
+            <img src="./assets/logo.jpg" alt="Origem">
+            <span class="nav-origin-text">Farolândia, Aracaju</span>
+        </div>
+        <button class="dark-btn" @click="toggleDark" :title="isDark ? 'Modo Claro' : 'Modo Escuro'">
+            <svg v-if="isDark" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            <svg v-else xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+    </nav>
 
-        <!-- ══ MAIN ══ -->
-        <main class="container">
-            <div class="main-grid" :class="{'route-generated': hasResults || isProcessing}">
+    <!-- ═══ WORKSPACE ═════════════════════════════════ -->
+    <div class="workspace" :class="{'has-results': hasResults || isProcessing}">
 
-                <!-- ══ LEFT SIDEBAR ══ -->
-                <div class="sidebar">
-
-                    <!-- Tip Card -->
-                    <div class="tip-card">
-                        <div class="tip-icon-wrap">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--brand-500)"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-                        </div>
-                        <div>
-                            <div class="tip-title">Como roteirizar bem?</div>
-                            <ul class="tip-list">
-                                <li><span><b>Padrão de ouro:</b> forneça <b>Rua, Número, Bairro</b> para o pino exato no mapa.</span></li>
-                                <li><span><b>Acentos</b> são opcionais. <b>Farolandia</b> e <b>Farolândia</b> funcionam igualmente.</span></li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- Add Order -->
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="card-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                            </div>
-                            <div>
-                                <div class="card-title">Adicionar Parada</div>
-                            </div>
-                        </div>
-
-                        <form @submit.prevent="addOrder" class="form-stack">
-                            <div>
-                                <label for="input-address" class="field-label">Endereço de entrega</label>
-                                <input id="input-address" v-model="newAddress" type="text" required
-                                    class="text-input" placeholder="Rua X, 123, Bairro">
-                            </div>
-                            <div>
-                                <label for="input-complement" class="field-label">Complemento <span class="text-muted">(opcional)</span></label>
-                                <input id="input-complement" v-model="newComplement" type="text"
-                                    class="text-input" placeholder="Apt 302, Bloco B, Casa dos fundos…">
-                            </div>
-                            <div class="qty-row">
-                                <div class="qty-label-wrap">
-                                    <label class="field-label">Qtd. Feijoadas</label>
-                                    <div class="counter">
-                                        <button type="button" class="counter-btn" @click="decrementAmount">−</button>
-                                        <input v-model.number="newAmount" type="number" min="1" class="counter-val" style="border:none;background:none;font-family:inherit;font-size:1rem;font-weight:700;width:44px;text-align:center;">
-                                        <button type="button" class="counter-btn" @click="incrementAmount">+</button>
-                                    </div>
-                                </div>
-                                <button type="submit" class="btn btn-primary" :disabled="orders.length >= 12">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                                    Inserir
-                                </button>
-                            </div>
-                        </form>
-
-                        <!-- Limit warning -->
-                        <div v-if="orders.length >= 12" class="error-banner mt-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                            <div><strong>Limite de 12 paradas atingido</strong></div>
-                        </div>
-                    </div>
-
-                    <!-- Block List -->
-                    <div class="card">
-                        <div class="order-list-header">
-                            <div>
-                                <div class="card-title">Bloco Atual</div>
-                            </div>
-                            <div style="display:flex;align-items:center;gap:0.5rem;">
-                                <button v-if="orders.length > 0" @click="clearBlock" class="btn btn-secondary" style="padding:0.3rem 0.7rem;font-size:0.75rem;">Limpar</button>
-                                <span class="badge" :class="orders.length > 0 ? 'badge-orange' : ''">{{ orders.length }}/12</span>
-                            </div>
-                        </div>
-
-                        <!-- Empty -->
-                        <div v-if="orders.length === 0" class="empty-state">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
-                            <p>Nenhum pedido adicionado ainda.</p>
-                        </div>
-
-                        <!-- Items -->
-                        <div v-else style="max-height:340px;overflow-y:auto;padding-right:2px;">
-                            <div v-for="(o, idx) in orders" :key="idx" class="order-item">
-
-                                <!-- VIEW MODE -->
-                                <template v-if="editingIndex !== idx">
-                                    <div class="order-num">{{ idx + 1 }}</div>
-                                    <div class="order-info">
-                                        <div class="order-addr" :title="o.address">{{ o.address }}</div>
-                                        <div v-if="o.complement" class="order-complement">{{ o.complement }}</div>
-                                        <div class="order-qty">{{ o.amount }}× Feijoada</div>
-                                    </div>
-                                    <div class="order-actions">
-                                        <button @click="moveUp(idx)" :disabled="idx === 0" class="action-btn" title="Mover para cima">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
-                                        </button>
-                                        <button @click="moveDown(idx)" :disabled="idx === orders.length - 1" class="action-btn" title="Mover para baixo">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-                                        </button>
-                                        <button @click="startEdit(idx)" class="action-btn" title="Editar">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
-                                        </button>
-                                        <button @click="removeOrder(idx)" class="action-btn action-btn-danger" title="Remover">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                                        </button>
-                                    </div>
-                                </template>
-
-                                <!-- EDIT MODE -->
-                                <template v-else>
-                                    <div class="edit-wrap">
-                                        <input v-model="editAddress" type="text" class="text-input" style="font-size:16px;" placeholder="Rua, Número, Bairro">
-                                        <input v-model="editComplement" type="text" class="text-input" style="font-size:16px;" placeholder="Complemento (Opcional)">
-                                        <div class="edit-actions">
-                                            <div class="counter" style="height:40px;">
-                                                <button type="button" class="counter-btn" @click="editAmount > 1 ? editAmount-- : null" style="width:40px;height:40px;">−</button>
-                                                <input v-model.number="editAmount" type="number" min="1" style="font-size:16px;border:none;background:none;font-family:inherit;width:36px;text-align:center;font-weight:700;">
-                                                <button type="button" class="counter-btn" @click="editAmount++" style="width:40px;height:40px;">+</button>
-                                            </div>
-                                            <button @click="saveEdit" class="btn btn-primary" style="flex:1;">Salvar</button>
-                                            <button @click="cancelEdit" class="action-btn action-btn-danger" title="Cancelar">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </template>
-
-                            </div>
-                        </div>
-
-                        <!-- Generate -->
-                        <div class="generate-wrap" v-if="orders.length > 0">
-                            <div class="divider"></div>
-                            <button id="btn-generate" @click="processRoute" class="btn btn-block w-full" :disabled="orders.length === 0 || isProcessing">
-                                <template v-if="isProcessing">
-                                    <svg class="spin" style="width:18px;height:18px;" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-dasharray="32" stroke-linecap="round"/></svg>
-                                    Otimizando…
-                                </template>
-                                <template v-else>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                                    Gerar Rota Otimizada
-                                </template>
-                            </button>
-                            <p class="progress-tip" v-if="!isProcessing">{{ orders.length }} parada{{ orders.length > 1 ? 's' : '' }} · clique para calcular</p>
-                            <p class="progress-tip" v-else>Geolocalização em andamento (≈{{ orders.length }}s)…</p>
-                        </div>
-                    </div>
-
-                </div><!-- /sidebar -->
-
-                <!-- ══ RIGHT PANEL ══ -->
-                <div>
-
-                    <!-- Error Message -->
-                    <div v-if="errorMessage" class="error-banner" style="margin-bottom:1rem;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                        <div>
-                            <strong>Erro ao processar</strong>
-                            <p>{{ errorMessage }}</p>
-                        </div>
-                    </div>
-
-                    <!-- Empty State -->
-                    <div v-if="!hasResults && !isProcessing" class="empty-state-card">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
-                        <h3>Aguardando Pedidos</h3>
-                        <p>Adicione os endereços de entrega e clique em "Gerar Rota" para ver a sequência otimizada aqui.</p>
-                    </div>
-
-                    <!-- Processing -->
-                    <div v-if="isProcessing" class="processing-card">
-                        <div class="spinner"></div>
-                        <div style="text-align:center;">
-                            <h3>Geolocalizando endereços…</h3>
-                            <p>A API de mapas processa um endereço por segundo. Aguarde um instante.</p>
-                        </div>
-                    </div>
-
-                    <!-- Results -->
-                    <div v-if="hasResults && !isProcessing" class="results-panel">
-
-                        <!-- Stats -->
-                        <div class="stats-row">
-                            <div class="stat-card">
-                                <div class="stat-icon-wrap">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                                </div>
-                                <div class="stat-label">Paradas</div>
-                                <div class="stat-value">{{ results.summary.total_stops }}</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-icon-wrap">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 11h.01"/><path d="M11 15h.01"/><path d="M16 16h.01"/><path d="m2 16 20 6-6-20A20 20 0 0 0 2 16"/><path d="M5.71 17.11a17.04 17.04 0 0 1 11.4-11.4"/></svg>
-                                </div>
-                                <div class="stat-label">Feijoadas</div>
-                                <div class="stat-value">{{ results.summary.total_amount }}</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-icon-wrap">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
-                                </div>
-                                <div class="stat-label">Distância</div>
-                                <div class="stat-value">{{ currentDistance }}<span class="stat-unit"> km</span></div>
-                            </div>
-                        </div>
-
-                        <!-- Toggle View -->
-                        <div class="toggle-bar">
-                            <div>
-                                <div class="toggle-info-title">Modo de Visualização</div>
-                                <div class="toggle-info-sub" v-if="isOptimizedView">Rota otimizada pelo algoritmo Vizinho Mais Próximo.</div>
-                                <div class="toggle-info-sub" v-else>Ordem cronológica de inserção dos pedidos.</div>
-                            </div>
-                            <div class="toggle-pill-track">
-                                <button @click="isOptimizedView = false" class="pill-inner" :class="{ active: !isOptimizedView }">Inserção</button>
-                                <button @click="isOptimizedView = true" class="pill-inner" :class="{ 'active-opt': isOptimizedView }">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                                    Otimizada
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Timeline -->
-                        <div class="timeline-card">
-                            <!-- Origin -->
-                            <div class="origin-row">
-                                <div style="display:flex;flex-direction:column;align-items:center;">
-                                    <div class="origin-dot">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                                    </div>
-                                    <div class="origin-line"></div>
-                                </div>
-                                <div>
-                                    <div class="origin-eyebrow">Ponto de Partida</div>
-                                    <div class="origin-name">Recanto da Feijoada</div>
-                                    <div class="origin-sub">Farolândia, Aracaju — SE</div>
-                                </div>
-                            </div>
-
-                            <!-- Stops -->
-                            <div v-for="(node, idx) in currentViewList" :key="idx + '-' + node.address" class="stop-row">
-                                <div class="stop-track">
-                                    <div class="stop-dot"></div>
-                                    <div v-if="idx < currentViewList.length - 1" class="stop-line"></div>
-                                </div>
-                                <div class="stop-content">
-                                    <div style="flex:1;min-width:0;">
-                                        <div class="stop-badge">Parada {{ idx + 1 }}</div>
-                                        <div class="stop-addr">{{ node.address }}</div>
-                                        <div v-if="node.complement" class="stop-complement">{{ node.complement }}</div>
-                                    </div>
-                                    <div class="stop-qty-box">
-                                        <div class="stop-qty-num">{{ node.amount }}</div>
-                                        <div class="stop-qty-label">feijoada</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Geo Errors -->
-                        <div v-if="geoErrors.length > 0" class="error-banner">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                            <div class="geo-errors">
-                                <strong>{{ geoErrors.length }} endereço(s) não localizado(s)</strong>
-                                <p v-for="err in geoErrors" :key="err.index">· {{ err.address }}</p>
-                            </div>
-                        </div>
-
-                        <!-- Export Bar -->
-                        <div class="export-bar">
-                            <div>
-                                <div class="export-title">Exportar Rota</div>
-                                <div class="export-sub">Envie ou compartilhe nos seus canais</div>
-                            </div>
-                            <div class="export-actions">
-                                <button class="btn-export btn-export-gmaps" @click="exportGoogleMaps">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-                                    Maps
-                                </button>
-                                <button class="btn-export btn-export-waze" @click="exportWaze">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                                    Waze
-                                </button>
-                                <button class="btn-export btn-export-whatsapp" @click="exportWhatsApp">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                                    WhatsApp
-                                </button>
-                                <button class="btn-export" @click="exportClipboard">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>
-                                    Copiar
-                                </button>
-                                <button class="btn-export" @click="exportCSV">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
-                                    CSV
-                                </button>
-                                <button class="btn-export" @click="exportPrint">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
-                                    Imprimir
-                                </button>
-                            </div>
-                        </div>
-
-                    </div>
-                </div><!-- /right -->
+        <!-- ══ LEFT PANE ══════════════════════════════ -->
+        <aside class="left-pane">
+            <!-- Tip -->
+            <div class="tip-box" style="margin:.6rem .75rem 0;">
+                <svg class="tip-dot" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                <span class="tip-text"><b>Padrão:</b> Rua, Número, Bairro — quanto mais completo, mais preciso o pino no mapa.</span>
             </div>
+
+            <!-- Form -->
+            <div class="form-section">
+                <form @submit.prevent="addOrder">
+                    <label for="inp-addr" class="field-label">Endereço de entrega</label>
+                    <input id="inp-addr" v-model="newAddress" type="text" required
+                        class="text-input" placeholder="Rua X, 123, Bairro">
+
+                    <div class="field-gap">
+                        <label for="inp-comp" class="field-label">Complemento <span style="font-weight:400;color:var(--c-txt-3)">(opcional)</span></label>
+                        <input id="inp-comp" v-model="newComplement" type="text"
+                            class="text-input" placeholder="Apt 302, Bloco B…">
+                    </div>
+
+                    <div class="qty-row">
+                        <div>
+                            <label class="field-label">Qtd.</label>
+                            <div class="counter">
+                                <button type="button" class="counter-btn" @click="decrementAmount">−</button>
+                                <input v-model.number="newAmount" type="number" min="1" class="counter-val">
+                                <button type="button" class="counter-btn" @click="incrementAmount">+</button>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-add" :disabled="orders.length >= 12">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            Inserir Parada
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Order List Header -->
+            <div class="order-list-header">
+                <span class="order-list-title">Bloco Atual</span>
+                <span class="badge" :class="orders.length > 0 ? 'badge-accent' : ''">{{ orders.length }}/12</span>
+                <button v-if="orders.length > 0" @click="clearBlock" class="btn-ghost">Limpar</button>
+            </div>
+
+            <!-- Order Scroll -->
+            <div class="order-scroll">
+
+                <div v-if="orders.length === 0" class="empty-order">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+                    <p>Nenhum pedido adicionado</p>
+                </div>
+
+                <div v-for="(o, idx) in orders" :key="idx" class="order-row">
+                    <!-- VIEW -->
+                    <template v-if="editingIndex !== idx">
+                        <div class="order-num">{{ idx + 1 }}</div>
+                        <div class="order-info">
+                            <div class="order-addr" :title="o.address">{{ o.address }}</div>
+                            <div v-if="o.complement" class="order-sub">{{ o.complement }}</div>
+                            <div class="order-meta">{{ o.amount }}× Feijoada</div>
+                        </div>
+                        <div class="row-actions">
+                            <button @click="moveUp(idx)"   :disabled="idx === 0"                  class="act-btn" title="Subir">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+                            </button>
+                            <button @click="moveDown(idx)" :disabled="idx === orders.length - 1" class="act-btn" title="Descer">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                            </button>
+                            <button @click="startEdit(idx)" class="act-btn" title="Editar">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+                            </button>
+                            <button @click="removeOrder(idx)" class="act-btn act-btn-danger" title="Remover">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            </button>
+                        </div>
+                    </template>
+                    <!-- EDIT -->
+                    <template v-else>
+                        <div class="edit-block">
+                            <input v-model="editAddress" type="text" class="text-input" style="font-size:16px;" placeholder="Rua, Número, Bairro">
+                            <input v-model="editComplement" type="text" class="text-input" style="font-size:16px;" placeholder="Complemento (opcional)">
+                            <div class="edit-row">
+                                <div class="counter" style="height:36px;">
+                                    <button type="button" class="counter-btn" @click="editAmount > 1 ? editAmount-- : null" style="width:36px;height:36px;">−</button>
+                                    <input v-model.number="editAmount" type="number" min="1" class="counter-val" style="font-size:16px;">
+                                    <button type="button" class="counter-btn" @click="editAmount++" style="width:36px;height:36px;">+</button>
+                                </div>
+                                <button @click="saveEdit" class="btn-save" style="flex:1;">Salvar</button>
+                                <button @click="cancelEdit" class="act-btn act-btn-danger" title="Cancelar">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <!-- Error limit -->
+            <div v-if="orders.length >= 12" style="margin:.4rem .75rem 0; padding:.5rem .75rem; background:rgba(220,38,38,.06); border:1px solid rgba(220,38,38,.15); border-radius:var(--r-md); font-size:.73rem; color:var(--c-red);">
+                Limite de 12 paradas atingido.
+            </div>
+
+            <!-- Generate -->
+            <div class="gen-footer">
+                <button id="btn-generate" @click="processRoute" class="btn-generate" :disabled="orders.length === 0 || isProcessing">
+                    <template v-if="isProcessing">
+                        <svg class="spin" style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-dasharray="32" stroke-linecap="round"/></svg>
+                        Otimizando…
+                    </template>
+                    <template v-else>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                        Gerar Rota Otimizada
+                    </template>
+                </button>
+            </div>
+        </aside>
+
+        <!-- ══ RIGHT PANE ════════════════════════════ -->
+        <main class="right-pane">
+
+            <!-- Error from fetch -->
+            <div v-if="errorMessage" class="err-bar" style="margin:.75rem .75rem 0; flex-shrink:0;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <div>
+                    <strong>Erro ao processar</strong>
+                    <p>{{ errorMessage }}</p>
+                </div>
+            </div>
+
+            <!-- Empty -->
+            <div v-if="!hasResults && !isProcessing" class="center-state">
+                <div class="empty-card">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+                    <h3>Rota não gerada</h3>
+                    <p>Adicione endereços ao lado e clique em "Gerar Rota" para ver a sequência otimizada aqui.</p>
+                </div>
+            </div>
+
+            <!-- Processing -->
+            <div v-if="isProcessing" class="center-state">
+                <div class="spinner"></div>
+                <div style="text-align:center;">
+                    <div style="font-size:.9rem;font-weight:700;color:var(--c-txt);margin-bottom:.3rem;">Geolocalizando endereços…</div>
+                    <div style="font-size:.78rem;color:var(--c-txt-3);max-width:240px;">A API processa ~1 endereço por segundo. Aguarde.</div>
+                </div>
+            </div>
+
+            <!-- Results -->
+            <div v-if="hasResults && !isProcessing" class="results-layout">
+
+                <!-- Stats -->
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                        </div>
+                        <div>
+                            <div class="stat-label">Paradas</div>
+                            <div class="stat-val">{{ results.summary.total_stops }}</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 11h.01"/><path d="M11 15h.01"/><path d="M16 16h.01"/><path d="m2 16 20 6-6-20A20 20 0 0 0 2 16"/><path d="M5.71 17.11a17.04 17.04 0 0 1 11.4-11.4"/></svg>
+                        </div>
+                        <div>
+                            <div class="stat-label">Feijoadas</div>
+                            <div class="stat-val">{{ results.summary.total_amount }}</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+                        </div>
+                        <div>
+                            <div class="stat-label">Distância</div>
+                            <div class="stat-val">{{ currentDistance }}<span class="stat-unit"> km</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Toggle -->
+                <div class="toggle-row">
+                    <div>
+                        <div class="toggle-label">Modo de Visualização</div>
+                        <div class="toggle-sub" v-if="isOptimizedView">Algoritmo Vizinho Mais Próximo aplicado.</div>
+                        <div class="toggle-sub" v-else">Ordem cronológica dos pedidos inseridos.</div>
+                    </div>
+                    <div class="segment-track">
+                        <button @click="isOptimizedView = false" class="seg-btn" :class="{ 'seg-active': !isOptimizedView }">Original</button>
+                        <button @click="isOptimizedView = true"  class="seg-btn" :class="{ 'seg-opt': isOptimizedView }">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                            Otimizada
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Geo errors -->
+                <div v-if="geoErrors.length > 0" class="err-bar" style="flex-shrink:0;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    <div>
+                        <strong>{{ geoErrors.length }} endereço(s) não localizado(s)</strong>
+                        <p v-for="err in geoErrors" :key="err.index">· {{ err.address }}</p>
+                    </div>
+                </div>
+
+                <!-- Timeline -->
+                <div class="timeline-wrap">
+                    <!-- Origin -->
+                    <div class="origin-row">
+                        <div class="o-connector">
+                            <div class="o-dot">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                            </div>
+                            <div class="o-line"></div>
+                        </div>
+                        <div>
+                            <div class="o-eyebrow">Ponto de Partida</div>
+                            <div class="o-name">Recanto da Feijoada</div>
+                            <div class="o-sub">Farolândia, Aracaju — SE</div>
+                        </div>
+                    </div>
+
+                    <!-- Stops -->
+                    <div v-for="(node, idx) in currentViewList" :key="idx + '-' + node.address" class="stop-row">
+                        <div class="s-track">
+                            <div class="s-dot"></div>
+                            <div v-if="idx < currentViewList.length - 1" class="s-line"></div>
+                        </div>
+                        <div class="stop-pill">
+                            <div style="flex:1;min-width:0;">
+                                <div class="s-badge">Parada {{ idx + 1 }}</div>
+                                <div class="s-addr">{{ node.address }}</div>
+                                <div v-if="node.complement" class="s-comp">{{ node.complement }}</div>
+                            </div>
+                            <div class="s-qty-box">
+                                <div class="s-qty-num">{{ node.amount }}</div>
+                                <div class="s-qty-lbl">feij.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Export -->
+                <div class="export-row">
+                    <span class="export-label">Exportar</span>
+                    <div class="export-actions">
+                        <button class="export-btn eb-gm" @click="exportGoogleMaps">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+                            Maps
+                        </button>
+                        <button class="export-btn eb-wz" @click="exportWaze">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                            Waze
+                        </button>
+                        <button class="export-btn eb-wa" @click="exportWhatsApp">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                            WhatsApp
+                        </button>
+                        <button class="export-btn" @click="exportClipboard">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>
+                            Copiar
+                        </button>
+                        <button class="export-btn" @click="exportCSV">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                            CSV
+                        </button>
+                        <button class="export-btn" @click="exportPrint">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+                            Imprimir
+                        </button>
+                    </div>
+                </div>
+
+            </div><!-- /results-layout -->
         </main>
 
-        <footer class="footer">© 2026 Recanto da Feijoada · Roteirização Inteligente por LucroMáximo Logistics</footer>
+    </div><!-- /workspace -->
 
-        <!-- Toast -->
-        <div v-if="toastMessage" class="toast">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-            {{ toastMessage }}
-        </div>
+    <!-- Toast -->
+    <div v-if="toastMessage" class="toast">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        {{ toastMessage }}
+    </div>
 
-    </div><!-- /#app -->
+</div>
 
-    <script src="./app.js"></script>
+<script src="./app.js"></script>
 </body>
 </html>
