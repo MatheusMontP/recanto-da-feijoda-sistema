@@ -96,7 +96,7 @@ def _nominatim_query(query: str) -> tuple[float, float] | None:
         logger.warning("Nominatim não encontrou: '%s'", normalized)
         _geocode_cache[normalized] = None
         return None
-    except (GeocoderTimedOut, GeocoderUnavailable) as exc:
+    except Exception as exc:
         logger.error("Erro Nominatim para '%s': %s", normalized, exc)
         return None
 
