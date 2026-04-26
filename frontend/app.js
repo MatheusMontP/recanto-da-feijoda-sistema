@@ -290,27 +290,6 @@ const App = {
             showToast("Abrindo Google Maps…");
         }
 
-        function exportWaze() {
-            if (!hasResults.value) return;
-            const list = currentViewList.value;
-            // Waze supports single destination — open the first stop
-            if (list.length > 0) {
-                const first = list[0];
-                const lat = first.lat;
-                const lon = first.lon;
-                
-                // Detectar se é dispositivo móvel para usar o scheme nativo (100% garantido no app)
-                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-                
-                if (isMobile) {
-                    window.location.href = `waze://?ll=${lat},${lon}&navigate=yes`;
-                } else {
-                    window.open(`https://www.waze.com/ul?ll=${lat},${lon}&navigate=yes`, "_blank");
-                }
-                showToast("Abrindo Waze (1ª parada)…");
-            }
-        }
-
         return {
             newAddress, newComplement, newAmount, orders, isProcessing, errorMessage, results,
             hasResults, isOptimizedView, currentViewList, currentDistance, toastMessage,
@@ -319,7 +298,7 @@ const App = {
             editingIndex, editAddress, editComplement, editAmount, startEdit, cancelEdit, saveEdit,
             moveUp, moveDown,
             decrementAmount, incrementAmount, addOrder, removeOrder, clearBlock, processRoute,
-            exportWhatsApp, exportClipboard, exportCSV, exportPrint, exportGoogleMaps, exportWaze,
+            exportWhatsApp, exportClipboard, exportCSV, exportPrint, exportGoogleMaps,
         };
     },
     mounted() { refreshIcons(); },
