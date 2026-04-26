@@ -323,11 +323,11 @@ def optimize_route(req: RouteRequest):
 
         # Regra de negócio: raio máximo de 50km a partir do restaurante
         dist_from_origin = haversine(origin[0], origin[1], coords[0], coords[1])
-        if dist_from_origin > 50.0:
+        if dist_from_origin > 25.0:
             geo_errors.append({
                 "index": entry["original_idx"],
                 "address": entry["address"],
-                "message": f"Endereço '{entry['address']}' está a {dist_from_origin:.0f}km do restaurante (máx. 50km). Verifique se o endereço está correto.",
+                "message": f"Endereço '{entry['address']}' está a {dist_from_origin:.0f}km do restaurante (máx. 25km). Verifique se o endereço está correto.",
             })
             logger.warning("Endereço fora do raio de entrega (%.1fkm): '%s'", dist_from_origin, entry["address"])
             continue
