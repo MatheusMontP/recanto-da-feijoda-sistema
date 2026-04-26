@@ -35,11 +35,67 @@ const App = {
         const newAddress = ref("");
         const newComplement = ref("");
         const newAmount = ref(1);
-        const orders = ref([]);
-        const isProcessing = ref(false);
-        const errorMessage = ref("");
-        const results = ref(null);
-        const isOptimizedView = ref(true);
+        const activeBlockIndex = ref(0);
+        const blocks = ref([
+            { orders: [], results: null, isProcessing: false, errorMessage: "", isOptimizedView: true },
+            { orders: [], results: null, isProcessing: false, errorMessage: "", isOptimizedView: true },
+            { orders: [], results: null, isProcessing: false, errorMessage: "", isOptimizedView: true }
+        ]);
+        const returnToOrigin = ref(true);
+
+        // ── Persistência (LocalStorage) ──
+        function saveState() {
+            localStorage.setItem("recanto-logistics-state", JSON.stringify({
+                blocks: blocks.value,
+                returnToOrigin: returnToOrigin.value,
+                activeBlockIndex: activeBlockIndex.value
+            }));
+        }
+
+        function loadState() {
+            const saved = localStorage.getItem("recanto-logistics-state");
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    // Restauramos blocos, mas resetamos flags de processamento
+                    blocks.value = data.blocks.map(b => ({ ...b, isProcessing: false, errorMessage: "" }));
+                    returnToOrigin.value = data.returnToOrigin;
+                    activeBlockIndex.value = data.activeBlockIndex || 0;
+                } catch (e) {
+                    console.error("Erro ao carregar estado salvo", e);
+                }
+            }
+        }
+
+        // Observa mudanças para salvar automaticamente
+        watch([blocks, returnToOrigin, activeBlockIndex], saveState, { deep: true });
+
+        const orders = computed({
+            get: () => blocks.value[activeBlockIndex.value].orders,
+            set: (val) => { blocks.value[activeBlockIndex.value].orders = val; }
+        });
+        const results = computed({
+            get: () => blocks.value[activeBlockIndex.value].results,
+            set: (val) => { blocks.value[activeBlockIndex.value].results = val; }
+        });
+        const isProcessing = computed({
+            get: () => blocks.value[activeBlockIndex.value].isProcessing,
+            set: (val) => { blocks.value[activeBlockIndex.value].isProcessing = val; }
+        });
+        const errorMessage = computed({
+            get: () => blocks.value[activeBlockIndex.value].errorMessage,
+            set: (val) => { blocks.value[activeBlockIndex.value].errorMessage = val; }
+        });
+        const isOptimizedView = computed({
+            get: () => blocks.value[activeBlockIndex.value].isOptimizedView,
+            set: (val) => { blocks.value[activeBlockIndex.value].isOptimizedView = val; }
+        });
+
+        watch(returnToOrigin, () => {
+            // Invalida todos os resultados se mudar a opção global
+            blocks.value.forEach(b => b.results = null);
+        });
+
         const toastMessage = ref("");
 
         // ── Dark mode ──
@@ -139,7 +195,7 @@ const App = {
 
         function addOrder() {
             if (!newAddress.value.trim() || newAmount.value < 1) return;
-            if (orders.value.length >= 12) return;
+            if (orders.value.length >= 15) return;
             orders.value.push({ address: newAddress.value.trim(), complement: newComplement.value.trim(), amount: newAmount.value });
             newAddress.value = "";
             newComplement.value = "";
@@ -178,7 +234,11 @@ const App = {
                 const res = await fetch(`${baseUrl}/api/optimize_route`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ orders: orders.value }),
+                    body: JSON.stringify({ 
+                        orders: orders.value,
+                        optimize_for: "distance", // Sempre por KM conforme pedido
+                        return_to_origin: returnToOrigin.value
+                    }),
                 });
                 if (!res.ok) {
                     const err = await res.json().catch(() => null);
@@ -207,7 +267,9 @@ const App = {
             const total = results.value.summary.total_amount;
 
             let text = `🍲 RECANTO DA FEIJOADA — Roteiro de Entregas\n`;
+            text += `📦 BLOCO ${activeBlockIndex.value + 1} — ENTREGADOR ${activeBlockIndex.value + 1}\n`;
             text += `📍 Modo: ${mode}\n`;
+            text += `↩️ Retorno ao Restaurante: ${returnToOrigin.value ? 'Sim' : 'Não'}\n`;
             text += `📏 Distância: ~${dist} km (Estimada, sujeita a variação do GPS)\n`;
             text += `🥘 Total: ${total} feijoadas\n`;
             text += `─────────────────────\n`;
@@ -385,16 +447,24 @@ const App = {
         function exportGoogleMaps() {
             if (!hasResults.value) return;
             const list = currentViewList.value;
-            // Enviar os endereços em texto force o Google Maps a usar o próprio geocoder de alta precisão
-            // ao invés de aceitar as coordenadas do OpenStreetMap que podem causar incongruência de número na rua
-            const origin = encodeURIComponent("R. Brasílio Martinho Vale, 46, Farolândia, Aracaju");
-            const stops = list.map(n => encodeURIComponent(n.address));
+            const origin = encodeURIComponent("R. Brasílio Martinho Vale, 46, Farolândia, Aracaju - SE");
+            
+            const stops = list.map(n => {
+                let addr = n.address;
+                if (!addr.toLowerCase().includes("aracaju")) {
+                    addr += ", Aracaju - SE";
+                }
+                return encodeURIComponent(addr);
+            });
             
             let url = `https://www.google.com/maps/dir/${origin}`;
             if (stops.length > 0) {
                 const destination = stops.pop();
                 stops.forEach(s => { url += `/${s}`; });
                 url += `/${destination}`;
+                if (returnToOrigin.value) {
+                    url += `/${origin}`;
+                }
             }
             window.open(url, "_blank");
             showToast("Abrindo Google Maps…");
@@ -404,6 +474,7 @@ const App = {
             newAddress, newComplement, newAmount, orders, isProcessing, errorMessage, results,
             hasResults, isOptimizedView, currentViewList, currentDistance, toastMessage,
             geoErrors,
+            activeBlockIndex, blocks, returnToOrigin,
             isDark, toggleDark,
             editingIndex, editAddress, editComplement, editAmount, startEdit, cancelEdit, saveEdit,
             moveUp, moveDown,
@@ -411,7 +482,21 @@ const App = {
             exportWhatsApp, exportClipboard, exportCSV, exportPrint, exportGoogleMaps,
         };
     },
-    mounted() { refreshIcons(); },
+    mounted() { 
+        this.$nextTick(() => {
+            // Pequeno delay para garantir que o loadState não conflite com a montagem inicial
+            const saved = localStorage.getItem("recanto-logistics-state");
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    this.blocks = data.blocks.map(b => ({ ...b, isProcessing: false, errorMessage: "" }));
+                    this.returnToOrigin = data.returnToOrigin;
+                    this.activeBlockIndex = data.activeBlockIndex || 0;
+                } catch (e) {}
+            }
+            refreshIcons(); 
+        });
+    },
 };
 
 createApp(App).mount("#app");

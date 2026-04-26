@@ -424,6 +424,7 @@
             font-size:.75rem; font-weight:600; color:var(--c-txt-3);
             transition:all .2s var(--ease);
             display:flex; align-items:center; gap:.3rem;
+            cursor:pointer; border:none; background:transparent;
         }
         .seg-btn.seg-active { background:var(--c-surface); color:var(--c-txt); box-shadow:var(--sh-sm); }
         .seg-btn.seg-opt    { background:var(--c-accent); color:#fff; box-shadow:0 2px 6px rgba(212,98,26,.3); }
@@ -620,6 +621,19 @@
                 </span>
             </div>
 
+            <!-- Tabs Entregadores -->
+            <div style="margin:.75rem .75rem 0; display:flex; gap:2px; background:var(--c-border); padding:2px; border-radius:var(--r-md);">
+                <button v-for="(b, i) in blocks" :key="i" @click="activeBlockIndex = i" 
+                    class="seg-btn" :class="{ 'seg-active': activeBlockIndex === i }"
+                    style="flex:1; justify-content:center; padding:.4rem 0;">
+                    Motoboy {{ i + 1 }}
+                    <span v-if="b.orders.length > 0" 
+                        style="font-size:.6rem; margin-left:4px; background:var(--c-accent); color:white; padding:1px 5px; border-radius:10px;">
+                        {{ b.orders.length }}
+                    </span>
+                </button>
+            </div>
+
             <!-- Form -->
             <div class="form-section">
                 <form @submit.prevent="addOrder">
@@ -652,8 +666,8 @@
 
             <!-- Order List Header -->
             <div class="order-list-header">
-                <span class="order-list-title">Bloco Atual</span>
-                <span class="badge" :class="orders.length > 0 ? 'badge-accent' : ''">{{ orders.length }}/12</span>
+                <span class="order-list-title">Lista Motoboy {{ activeBlockIndex + 1 }}</span>
+                <span class="badge" :class="orders.length > 0 ? 'badge-accent' : ''">{{ orders.length }}/15</span>
                 <button v-if="orders.length > 0" @click="clearBlock" class="btn-ghost">Limpar</button>
             </div>
 
@@ -711,8 +725,26 @@
             </div>
 
             <!-- Error limit -->
-            <div v-if="orders.length >= 12" style="margin:.4rem .75rem 0; padding:.5rem .75rem; background:rgba(220,38,38,.06); border:1px solid rgba(220,38,38,.15); border-radius:var(--r-md); font-size:.73rem; color:var(--c-red);">
-                Limite de 12 paradas atingido.
+            <div v-if="orders.length >= 15" style="margin:.4rem .75rem 0; padding:.5rem .75rem; background:rgba(220,38,38,.06); border:1px solid rgba(220,38,38,.15); border-radius:var(--r-md); font-size:.73rem; color:var(--c-red);">
+                Limite de 15 paradas atingido para este motoboy.
+            </div>
+
+            <!-- Route Options -->
+            <div class="route-options-box" style="margin:.75rem .75rem 0; padding:.75rem; background:var(--c-bg-2); border:1px solid var(--c-border); border-radius:var(--r-md);">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div style="display:flex; flex-direction:column;">
+                        <span style="font-size:.78rem; font-weight:600; color:var(--c-txt);">Retornar ao restaurante?</span>
+                        <span style="font-size:.65rem; color:var(--c-txt-3);">Soma a volta no cálculo do KM</span>
+                    </div>
+                    <div style="display:flex; background:var(--c-border); padding:2px; border-radius:var(--r-sm); gap:2px;">
+                        <button @click="returnToOrigin = true" 
+                            :class="returnToOrigin ? 'seg-active' : ''"
+                            class="seg-btn" style="padding:.3rem .8rem; font-size:.7rem;">Sim</button>
+                        <button @click="returnToOrigin = false" 
+                            :class="!returnToOrigin ? 'seg-active' : ''"
+                            class="seg-btn" style="padding:.3rem .8rem; font-size:.7rem;">Não</button>
+                    </div>
+                </div>
             </div>
 
             <!-- Generate -->
@@ -828,6 +860,10 @@
 
                 <!-- Timeline -->
                 <div class="timeline-wrap">
+                    <div style="font-size:.85rem; font-weight:800; color:var(--c-accent); text-transform:uppercase; letter-spacing:.05em; margin-bottom:.8rem; padding-bottom:.4rem; border-bottom:1px solid var(--c-border);">
+                        Rota para Motoboy {{ activeBlockIndex + 1 }}
+                    </div>
+                    
                     <!-- Origin -->
                     <div class="origin-row">
                         <div class="o-connector">
