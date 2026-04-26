@@ -317,9 +317,21 @@ def optimize_route(req: RouteRequest):
             geo_errors.append({
                 "index": entry["original_idx"],
                 "address": entry["address"],
-                "message": f"Endereço não localizado: '{entry['address']}'. Tente 'Rua, Bairro, Cidade'.",
+                "message": f"Endereço não localizado: '{entry['address']}'.",
             })
-            continue  # Pula, mas não aborta o bloco inteiro
+            continue
+
+        # Regra de negócio: raio máximo de 50km a partir do restaurante
+        dist_from_origin = haversine(origin[0], origin[1], coords[0], coords[1])
+        if dist_from_origin > 50.0:
+            geo_errors.append({
+                "index": entry["original_idx"],
+                "address": entry["address"],
+                "message": f"Endereço '{entry['address']}' está a {dist_from_origin:.0f}km do restaurante (máx. 50km). Verifique se o endereço está correto.",
+            })
+            logger.warning("Endereço fora do raio de entrega (%.1fkm): '%s'", dist_from_origin, entry["address"])
+            continue
+
         nodes.append({
             "address": entry["address"],
             "amount": entry["amount"],
