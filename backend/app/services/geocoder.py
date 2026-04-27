@@ -1,122 +1,111 @@
-import time
-from geopy.geocoders import Nominatim
-from geopy.extra.rate_limiter import RateLimiter
-from ..db.cache import get_cached_geocode, set_cached_geocode
-import re
-from ..core.config import RESTAURANTE_ENDERECO, RESTAURANTE_COORDS
+import aiohttp
+import asyncio
+import random
 import logging
+import re
+from typing import Dict, Optional, Tuple, List
+from ..db.cache import get_cached_geocode, set_cached_geocode
+from ..core.config import NOMINATIM_URL, USER_AGENT, URBAN_RADIUS_KM, RESTAURANTE_ENDERECO, RESTAURANTE_COORDS
 
 logger = logging.getLogger("lucromaximo")
 
-# Revertendo para Nominatim com segurança reforçada
-_geolocator = Nominatim(user_agent="lucromaximo_delivery_final_v5", timeout=15)
-geocode_service = RateLimiter(_geolocator.geocode, min_delay_seconds=1.6, max_retries=3, error_wait_seconds=5.0)
+# Semáforo para respeitar o limite de 1 req/s do Nominatim (Política de Uso)
+nominatim_sem = asyncio.Semaphore(1)
 
-def geocode_address(address: str):
+async def geocode_address(address: str) -> Optional[Dict]:
     """
-    Geocodifica um endereço com cache e estratégias otimizadas usando Nominatim.
+    Geocodifica um endereço usando estratégias progressivas de forma assíncrona.
     """
     if not address: return None
     
-    # 1. Atalho para o Restaurante
+    # 1. Atalho para o Restaurante (Instantâneo)
     if address.strip().lower() in [RESTAURANTE_ENDERECO.lower(), "recanto da feijoada", "origem"]:
         return {
             "lat": RESTAURANTE_COORDS[0], "lon": RESTAURANTE_COORDS[1],
             "display_name": RESTAURANTE_ENDERECO, "type": "restaurant", "weak": False
         }
 
-    # 2. Verificar Cache
+    # 2. Verificar Cache (Instantâneo)
     cached, exists = get_cached_geocode(address)
     if exists and cached:
-        dist = ((cached['lat'] - (-10.94))**2 + (cached['lon'] - (-37.07))**2)**0.5 * 111
-        if dist < 45:
-            return cached
+        return _apply_jitter(cached)
 
-    # 3. Preparação
-    original_address = address
-    cep_match = re.search(r'\b(\d{5}[-,\.\s]?\d{3})\b', address)
-    cep = cep_match.group(1) if cep_match else None
-    
-    # Limpeza para Nominatim
+    # 3. Preparação de Queries
     clean_addr = re.sub(r',?\s*Aracaju.*$', '', address, flags=re.IGNORECASE)
     clean_addr = re.sub(r'\b\d{5}[-,\.\s]?\d{3}\b', '', clean_addr)
     clean_addr = re.sub(r'\s+', ' ', clean_addr).strip().strip(",")
+    
+    cep_match = re.search(r'\b(\d{5}[-,\.\s]?\d{3})\b', address)
+    cep = cep_match.group(1) if cep_match else None
 
-    # Extrair Bairro se possível
-    bairro_found = None
-    bairros_conhecidos = ["atalaia", "aruana", "santa maria", "aeroporto", "farolandia", "coroa do meio", "jardins", "grageru"]
-    for b in bairros_conhecidos:
-        if b in address.lower():
-            bairro_found = b
-            break
-
+    # Estratégias (Priorizamos Rua + Número)
     strategies = [
-        # Estratégia 1: Endereço completo (Rua, Número, Bairro) - A mais assertiva
-        {"name": "full_specific", "query": f"{clean_addr}, Aracaju, SE, Brasil", "weak": False},
-        
-        # Estratégia 2: CEP + Número (Fallback caso a rua tenha nome comum)
+        {"name": "full", "query": f"{clean_addr}, Aracaju, SE, Brasil", "weak": False},
         {"name": "cep_num", "query": f"{re.search(r'(\d+)', address).group(1) if re.search(r'(\d+)', address) else ''}, {cep}, Aracaju, SE, Brasil", "weak": False} if cep else None,
-        
-        # Estratégia 3: Bairro puro (Para pontos imprecisos)
-        {"name": "bairro_only", "query": f"{bairro_found}, Aracaju, SE, Brasil", "weak": True} if bairro_found else None,
-        
-        # Estratégia 4: CEP Puro (Último recurso)
         {"name": "cep_only", "query": f"{cep}, Aracaju, SE, Brasil", "weak": True} if cep else None
     ]
     strategies = [s for s in strategies if s is not None]
 
-    # Execução
-    local_cities = ["aracaju", "sao cristovao", "barra dos coqueiros", "nossa senhora do socorro", "socorro", "atalaia", "farolandia"]
-    
+    # 4. Execução Controlada
     for s in strategies:
-        try:
-            logger.info(f"Nominatim Geocodificando ({s['name']}): {s['query']}")
-            location = geocode_service(s['query'])
-            
-            if location:
-                addr_lower = location.address.lower()
-                # Verifica se o resultado pertence à Grande Aracaju
-                is_local = any(city in addr_lower for city in local_cities)
-                
-                if not is_local:
-                    logger.warning(f"Nominatim: Ignorando resultado fora da região local: {location.address}")
-                    continue
-
-                res = {
-                    "lat": location.latitude,
-                    "lon": location.longitude,
-                    "display_name": location.address,
-                    "type": s['name'],
-                    "weak": s['weak']
-                }
-                
-                # Validação específica para o bairro Santa Maria (deve ser Zona Sul)
-                if bairro_found == "santa maria" and res['lat'] > -10.96:
-                     logger.warning(f"Nominatim: Santa Maria detectado na Zona Norte? Ignorando. {location.address}")
-                     continue
-
-                # Validação geográfica (raio de 25km para cobrir do Mosqueiro até o Porto d'Antas)
-                dist = ((res['lat'] - (-10.9472))**2 + (res['lon'] - (-37.0731))**2)**0.5 * 111
-                
-                # Filtro de texto: Só aceita se for Aracaju ou região metropolitana IMEDIATA
-                display_name = location.address.lower()
-                is_aracaju = "aracaju" in display_name or "aruana" in display_name or "mosqueiro" in display_name
-                is_outlier = "itaporanga" in display_name or "estância" in display_name or "lagarto" in display_name
-                
-                if dist < 25 and is_aracaju and not is_outlier:
-                    # Jitter: Se a coordenada for idêntica a algo que já processamos, damos um totó
-                    # (Lógica simples: usamos o timestamp para dar um offset de ~5-10 metros)
-                    import random
-                    res['lat'] += (random.random() - 0.5) * 0.0001
-                    res['lon'] += (random.random() - 0.5) * 0.0001
-                    
-                    set_cached_geocode(original_address, res)
-                    return res
-                else:
-                    logger.warning(f"Nominatim: Localização descartada (Longe/Fora de Aracaju): {location.address} ({dist:.1f}km)")
-                    return {"error": "imprecise", "dist": dist, "address": location.address}
-        except Exception as e:
-            logger.error(f"Erro Nominatim: {str(e)}")
-            time.sleep(2)
+        async with nominatim_sem:
+            result = await _fetch_nominatim(s['query'])
+            # Delay obrigatório para não ser banido pelo Nominatim
+            await asyncio.sleep(1.2)
+        
+        if result:
+            res_data = {
+                "lat": result[0],
+                "lon": result[1],
+                "display_name": result[2],
+                "type": s['name'],
+                "weak": s['weak']
+            }
+            # Cache e Jitter
+            final_res = _apply_jitter(res_data)
+            set_cached_geocode(address, final_res)
+            return final_res
 
     return None
+
+async def _fetch_nominatim(query: str) -> Optional[Tuple[float, float, str]]:
+    """Chamada real à API via aiohttp."""
+    params = {
+        "q": query,
+        "format": "json",
+        "addressdetails": 1,
+        "limit": 1
+    }
+    headers = {"User-Agent": USER_AGENT}
+
+    try:
+        async with aiohttp.ClientSession(headers=headers) as session:
+            async with session.get(NOMINATIM_URL, params=params, timeout=10) as resp:
+                if resp.status != 200: return None
+                data = await resp.json()
+                if not data: return None
+                
+                res = data[0]
+                lat, lon = float(res["lat"]), float(res["lon"])
+                display_name = res.get("display_name", "")
+                
+                # Validação de Aracaju (Rigidez Territorial)
+                dist_centro = ((lat - (-10.9472))**2 + (lon - (-37.0731))**2)**0.5 * 111
+                
+                # Filtros de segurança
+                is_outlier = any(x in display_name.lower() for x in ["itaporanga", "estancia", "lagarto"])
+                
+                if dist_centro < 25 and not is_outlier:
+                    return (lat, lon, display_name)
+                
+                logger.warning(f"Nominatim Outlier: {display_name} ({dist_centro:.1f}km)")
+                return None
+    except Exception as e:
+        logger.error(f"Erro aiohttp Nominatim: {e}")
+        return None
+
+def _apply_jitter(res: Dict) -> Dict:
+    """Aplica o desvio de 10m para evitar colapso de endereços idênticos."""
+    res['lat'] += (random.random() - 0.5) * 0.0001
+    res['lon'] += (random.random() - 0.5) * 0.0001
+    return res

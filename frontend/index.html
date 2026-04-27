@@ -16,6 +16,7 @@
         /* ─── TOKENS ─────────────────────────────────── */
         :root {
             --c-bg:       #F5EFE6;
+            --c-bg-2:     #EDE5D9;
             --c-surface:  #FFFFFF;
             --c-border:   #E5DDD4;
             --c-border2:  #D4C9BC;
@@ -53,6 +54,7 @@
         /* Dark */
         .dark {
             --c-bg:      #0F0A06;
+            --c-bg-2:     #1A1208;
             --c-surface: #1C1208;
             --c-border:  #2D1E10;
             --c-border2: #3D2A18;
@@ -377,12 +379,20 @@
 
         /* Results */
         .results-layout {
-            flex:1;
-            display:flex;
-            flex-direction:column;
-            overflow:hidden;
-            padding:.75rem;
-            gap:.65rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding: .75rem;
+            gap: .65rem;
+        }
+
+        .timeline-wrap {
+            flex: 1;
+            overflow-y: auto;
+            min-height: 0;
+            padding-right: 4px;
+            margin-right: -4px;
         }
 
         /* Stats Row */
@@ -467,78 +477,104 @@
         .err-bar strong { display:block; color:var(--c-red); font-size:.82rem; }
         .err-bar p { color:#9a4040; margin-top:.15rem; font-size:.75rem; }
 
-        /* Timeline */
-        .timeline-wrap {
-            flex:1; overflow-y:auto; min-height:0;
-            background:var(--c-surface); border:1px solid var(--c-border);
-            border-radius:var(--r-lg); padding:.85rem 1rem;
-            box-shadow:var(--sh-xs);
+        
+        .stop-row {
+            padding:1rem 1.1rem;
+            display:flex; align-items:center; gap:.85rem;
+            background:var(--c-surface);
+            border-bottom:1px solid var(--c-border);
+            transition:background .15s;
         }
-
-        .origin-row { display:flex; gap:.75rem; align-items:flex-start; margin-bottom:.85rem; }
-        .o-dot {
-            width:32px; height:32px; border-radius:50%; flex-shrink:0;
-            background:linear-gradient(135deg,var(--c-accent),var(--c-gold));
+        .stop-row:hover { background:var(--c-bg-2); }
+        
+        .s-num {
+            width:26px; height:26px; border-radius:50%;
+            background:var(--c-accent); color:#fff;
             display:flex; align-items:center; justify-content:center;
-            box-shadow:0 0 0 4px rgba(212,98,26,.12);
+            font-size:.85rem; font-weight:800; flex-shrink:0;
+            box-shadow:0 3px 8px rgba(212,98,26,.25);
         }
-        .o-dot svg { color:#fff; }
-        .o-connector { display:flex; flex-direction:column; align-items:center; flex-shrink:0; width:32px; }
-        .o-line { width:2px; background:linear-gradient(var(--c-accent),var(--c-border2)); height:14px; margin-top:3px; border-radius:2px; }
-        .o-eyebrow { font-size:.6rem; text-transform:uppercase; letter-spacing:.1em; color:var(--c-accent); font-weight:700; }
-        .o-name    { font-size:.88rem; font-weight:700; color:var(--c-txt); }
-        .o-sub     { font-size:.72rem; color:var(--c-txt-3); }
-
-        .stop-row { display:flex; gap:.75rem; align-items:flex-start; padding-bottom:.75rem; }
-        .s-track  { display:flex; flex-direction:column; align-items:center; flex-shrink:0; width:32px; }
-        .s-dot    { width:10px; height:10px; border-radius:50%; border:2px solid var(--c-border2); background:var(--c-surface); transition:border-color .15s; }
-        .stop-row:hover .s-dot { border-color:var(--c-accent); }
-        .s-line   { flex:1; width:2px; background:var(--c-border); min-height:14px; margin-top:3px; border-radius:2px; }
-        .stop-pill {
-            flex:1; min-width:0;
-            background:var(--c-bg); border-radius:var(--r-md);
-            padding:.6rem .8rem;
-            display:flex; justify-content:space-between; align-items:flex-start; gap:.65rem;
-            border:1px solid transparent;
-            transition:background .15s, border-color .15s;
+        .s-info { flex:1; min-width:0; }
+        .s-badge { 
+            font-size:.58rem; font-weight:800; text-transform:uppercase;
+            background:rgba(212,98,26,.1); color:var(--c-accent);
+            padding:.15rem .45rem; border-radius:4px; display:inline-block; margin-bottom:.25rem;
         }
-        .stop-row:hover .stop-pill { background:rgba(212,98,26,.04); border-color:rgba(212,98,26,.1); }
-        .s-badge   { font-size:.58rem; font-weight:800; background:rgba(147,51,234,0.1); color:var(--c-accent); padding:.15rem .45rem; border-radius:4px; display:inline-block; margin-bottom:.3rem; text-transform:uppercase; letter-spacing:.02em; }
-        .badge-error { background:rgba(217,119,6,0.1); color:#d97706; }
-        .s-addr    { font-size:.83rem; font-weight:500; color:var(--c-txt); word-break:break-word; }
-        .s-comp    { font-size:.7rem; color:var(--c-txt-3); margin-top:.1rem; }
+        .badge-error { background:rgba(220,38,38,.1); color:var(--c-red); }
+        .s-addr { font-size:.95rem; font-weight:700; color:var(--c-txt); line-height:1.2; word-break:break-word; }
+        .s-comp { font-size:.75rem; color:var(--c-txt-3); margin-top:.15rem; }
+        
         .s-qty-box {
-            background:var(--c-surface); border:1.5px solid rgba(212,98,26,.15);
-            border-radius:var(--r-md); padding:.35rem .65rem;
-            text-align:center; flex-shrink:0; min-width:44px;
+            background:var(--c-dark); color:#fff;
+            padding:.35rem .6rem; border-radius:var(--r-md);
+            text-align:center; min-width:44px; flex-shrink:0;
         }
-        .s-qty-num { font-size:1.1rem; font-weight:800; color:var(--c-accent); line-height:1; }
-        .s-qty-lbl { font-size:.56rem; text-transform:uppercase; letter-spacing:.06em; color:var(--c-txt-3); font-weight:700; }
+        .s-qty-val { font-size:1.05rem; font-weight:800; line-height:1; display:block; color:var(--c-gold); }
+        .s-qty-lab { font-size:.54rem; text-transform:uppercase; opacity:.7; font-weight:700; }
 
-        /* Export Bar */
-        .export-row {
-            flex-shrink:0;
-            background: linear-gradient(135deg, var(--c-dark) 0%, #4D290F 100%);
-            border-radius:var(--r-lg); padding:.75rem 1rem;
-            display:flex; align-items:center; gap:1rem; flex-wrap:wrap;
-            box-shadow:0 4px 16px rgba(40,21,10,.2);
+        /* Export Section Grid */
+        .export-grid-card {
+            background: var(--c-surface);
+            border: 1px solid var(--c-border);
+            border-radius: var(--r-lg);
+            padding: 1rem;
+            box-shadow: var(--sh-sm);
         }
-        .export-label { font-size:.78rem; font-weight:700; color:#fff; flex-shrink:0; }
-        .export-actions { display:flex; gap:.4rem; flex-wrap:wrap; flex:1; }
-        .export-btn {
-            height:32px; padding:0 .75rem;
-            display:inline-flex; align-items:center; gap:.35rem;
-            border:1.5px solid rgba(255,255,255,.15); color:rgba(255,255,255,.65);
-            background:rgba(255,255,255,.05); border-radius:var(--r-md);
-            font-size:.75rem; font-weight:600;
-            transition:all .12s; outline:none;
+        .export-actions-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: .65rem;
         }
-        .export-btn:hover { border-color:rgba(255,255,255,.35); color:#fff; background:rgba(255,255,255,.1); transform:translateY(-1px); }
-        .export-btn svg { width:12px; height:12px; }
-        .eb-wa  { border-color:rgba(37,211,102,.35); color:#4CE67A; }
-        .eb-wa:hover  { background:#25D366; border-color:#25D366; color:#fff; box-shadow:0 4px 10px rgba(37,211,102,.25); }
-        .eb-gm  { border-color:rgba(66,133,244,.35); color:#7BAEFF; }
-        .eb-gm:hover  { background:#4285F4; border-color:#4285F4; color:#fff; box-shadow:0 4px 10px rgba(66,133,244,.25); }
+        .export-action-btn {
+            background: var(--c-bg-2);
+            border: 1px solid var(--c-border);
+            border-radius: var(--r-md);
+            padding: .65rem .8rem;
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            cursor: pointer;
+            transition: all .2s var(--ease);
+            text-align: left;
+        }
+        .export-action-btn:hover {
+            transform: translateY(-2px);
+            background: var(--c-surface);
+            border-color: var(--c-accent);
+            box-shadow: var(--sh-sm);
+        }
+        .ea-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--c-surface);
+            border: 1px solid var(--c-border);
+            flex-shrink: 0;
+            transition: all .2s;
+        }
+        .ea-text { display: flex; flex-direction: column; gap: 1px; }
+        .ea-title { font-size: .82rem; font-weight: 800; color: var(--c-txt); }
+        .ea-desc { font-size: .62rem; color: var(--c-txt-3); font-weight: 500; }
+
+        /* Semantic styles for action buttons */
+        .ea-gm:hover .ea-icon { background: #E3F2FD; color: #1976D2; border-color: #BBDEFB; }
+        .ea-wa:hover .ea-icon { background: #E8F5E9; color: #2E7D32; border-color: #C8E6C9; }
+        .ea-cp:hover .ea-icon { background: #F3E5F5; color: #7B1FA2; border-color: #E1BEE7; }
+        .ea-ex:hover .ea-icon { background: #E8F5E9; color: #1B5E20; border-color: #C8E6C9; }
+        .ea-pr:hover .ea-icon { background: #FFF3E0; color: #E65100; border-color: #FFE0B2; }
+        
+        .ea-gm svg, .ea-wa svg, .ea-cp svg, .ea-ex svg, .ea-pr svg { color: var(--c-accent); }
+
+        /* Full width for print on desktop maybe? No, let's make it grid-column: span 2 for the last one if odd */
+        .ea-pr { grid-column: span 2; }
+
+        @media (max-width: 480px) {
+            .export-actions-grid { grid-template-columns: 1fr; }
+            .ea-pr { grid-column: span 1; }
+        }
 
         /* Toast */
         .toast {
@@ -596,9 +632,13 @@
             .seg-btn { flex:1; justify-content:center; }
 
             /* Export */
-            .export-row { padding:.65rem .8rem; gap:.5rem; }
-            .export-actions { display:grid; grid-template-columns:1fr 1fr; gap:.4rem; }
-            .export-btn { justify-content:center; }
+            .export-grid-card { padding: .75rem; }
+            .export-actions-grid { grid-template-columns: 1fr; gap: .5rem; }
+            .ea-pr { grid-column: span 1; }
+            .export-action-btn { padding: .5rem .7rem; }
+            .ea-icon { width: 32px; height: 32px; border-radius: 8px; }
+            .ea-title { font-size: .78rem; }
+            .ea-desc { font-size: .58rem; }
 
             /* Toast */
             .toast { left:1rem; right:1rem; bottom:1rem; justify-content:center; }
@@ -694,7 +734,7 @@
             <!-- Order List Header -->
             <div class="order-list-header">
                 <span class="order-list-title">Lista Motoboy {{ activeBlockIndex + 1 }}</span>
-                <span class="badge" :class="orders.length > 0 ? 'badge-accent' : ''">{{ orders.length }}/15</span>
+                <span class="badge" :class="orders.length > 0 ? 'badge-accent' : ''">{{ orders.length }}/12</span>
                 <button v-if="orders.length > 0" @click="clearBlock" class="btn-ghost">Limpar</button>
             </div>
 
@@ -752,8 +792,8 @@
             </div>
 
             <!-- Error limit -->
-            <div v-if="orders.length >= 15" style="margin:.4rem .75rem 0; padding:.5rem .75rem; background:rgba(220,38,38,.06); border:1px solid rgba(220,38,38,.15); border-radius:var(--r-md); font-size:.73rem; color:var(--c-red);">
-                Limite de 15 paradas atingido para este motoboy.
+            <div v-if="orders.length >= 12" style="margin:.4rem .75rem 0; padding:.5rem .75rem; background:rgba(220,38,38,.06); border:1px solid rgba(220,38,38,.15); border-radius:var(--r-md); font-size:.73rem; color:var(--c-red);">
+                Limite de 12 paradas atingido para este motoboy.
             </div>
 
             <!-- Route Options -->
@@ -774,12 +814,26 @@
                 </div>
             </div>
 
+            <!-- Progress UX -->
+            <div v-if="isProcessing" class="progress-container" style="margin:.75rem .75rem 0; padding:.85rem; background:rgba(212,98,26,.05); border:1px solid rgba(212,98,26,.15); border-radius:var(--r-md);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:.5rem;">
+                    <span style="font-size:.7rem; font-weight:700; color:var(--c-accent); text-transform:uppercase; letter-spacing:.05em;">{{ progressStatus }}</span>
+                    <span style="font-size:.75rem; font-weight:800; color:var(--c-txt);">{{ progressPercentage }}%</span>
+                </div>
+                <div class="progress-track" style="height:6px; background:rgba(212,98,26,.1); border-radius:10px; overflow:hidden;">
+                    <div class="progress-fill" :style="{ width: progressPercentage + '%' }" style="height:100%; background:var(--c-accent); transition:width .3s ease; box-shadow:0 0 8px rgba(212,98,26,.4);"></div>
+                </div>
+                <div style="margin-top:.5rem; font-size:.65rem; color:var(--c-txt-3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                    {{ progressMessage }}
+                </div>
+            </div>
+
             <!-- Generate -->
             <div class="gen-footer">
                 <button id="btn-generate" @click="processRoute" class="btn-generate" :disabled="orders.length === 0 || isProcessing">
                     <template v-if="isProcessing">
                         <svg class="spin" style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-dasharray="32" stroke-linecap="round"/></svg>
-                        Otimizando…
+                        Otimizando...
                     </template>
                     <template v-else>
                         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
@@ -836,132 +890,113 @@
             <!-- Results -->
             <div v-if="hasResults && !isProcessing" class="results-layout">
 
-                <!-- Stats -->
-                <div class="stats-row">
+                <!-- Results Header: Stats (No Distance) -->
+                <div class="stats-row" style="grid-template-columns: repeat(2, 1fr);">
                     <div class="stat-card">
-                        <div class="stat-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                        </div>
+                        <div class="stat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></div>
                         <div>
                             <div class="stat-label">Paradas</div>
                             <div class="stat-val">{{ results.summary.total_stops }}</div>
                         </div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 11h.01"/><path d="M11 15h.01"/><path d="M16 16h.01"/><path d="m2 16 20 6-6-20A20 20 0 0 0 2 16"/><path d="M5.71 17.11a17.04 17.04 0 0 1 11.4-11.4"/></svg>
-                        </div>
+                        <div class="stat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 11h.01"/><path d="M11 15h.01"/><path d="M16 16h.01"/><path d="m2 16 20 6-6-20A20 20 0 0 0 2 16"/><path d="M5.71 17.11a17.04 17.04 0 0 1 11.4-11.4"/></svg></div>
                         <div>
-                            <div class="stat-label">Feijoadas</div>
-                            <div class="stat-val">{{ results.summary.total_amount }}</div>
+                            <div class="stat-label">Total</div>
+                            <div class="stat-val">{{ results.summary.total_amount }} <span style="font-size:.7rem; opacity:.5;">UN</span></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Toggle -->
-                <div class="toggle-row">
-                    <div>
-                        <div class="toggle-label">Modo de Visualização</div>
-                        <div class="toggle-sub" v-if="isOptimizedView">Algoritmo Vizinho Mais Próximo aplicado.</div>
-                        <div class="toggle-sub" v-else">Ordem cronológica dos pedidos inseridos.</div>
-                    </div>
-                    <div class="segment-track">
-                        <button @click="isOptimizedView = false" class="seg-btn" :class="{ 'seg-active': !isOptimizedView }">Original</button>
-                        <button @click="isOptimizedView = true"  class="seg-btn" :class="{ 'seg-opt': isOptimizedView }">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                            Otimizada
+                <!-- Export Actions restored -->
+                <div class="export-grid-card">
+                    <div class="export-actions-grid">
+                        <button class="export-action-btn ea-gm" @click="exportGoogleMaps">
+                            <div class="ea-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg></div>
+                            <div class="ea-text">
+                                <span class="ea-title">Google Maps</span>
+                                <span class="ea-desc">Abrir no GPS</span>
+                            </div>
+                        </button>
+                        
+                        <button class="export-action-btn ea-wa" @click="exportWhatsApp">
+                            <div class="ea-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+                            <div class="ea-text">
+                                <span class="ea-title">WhatsApp</span>
+                                <span class="ea-desc">Enviar p/ Motoboy</span>
+                            </div>
+                        </button>
+
+                        <button class="export-action-btn ea-cp" @click="exportClipboard">
+                            <div class="ea-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg></div>
+                            <div class="ea-text">
+                                <span class="ea-title">Copiar Rota</span>
+                                <span class="ea-desc">Texto Formatado</span>
+                            </div>
+                        </button>
+
+                        <button class="export-action-btn ea-ex" @click="exportCSV">
+                            <div class="ea-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+                            <div class="ea-text">
+                                <span class="ea-title">Excel / CSV</span>
+                                <span class="ea-desc">Planilha Digital</span>
+                            </div>
+                        </button>
+
+                        <button class="export-action-btn ea-pr" @click="exportPrint">
+                            <div class="ea-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg></div>
+                            <div class="ea-text">
+                                <span class="ea-title">Imprimir</span>
+                                <span class="ea-desc">Cupom Térmico</span>
+                            </div>
                         </button>
                     </div>
                 </div>
 
                 <!-- Geo errors -->
-                <div v-if="geoErrors.length > 0" class="err-bar" style="flex-shrink:0; flex-direction:column; gap:.4rem;">
+                <div v-if="geoErrors.length > 0" class="err-bar" style="flex-shrink:0; flex-direction:column; gap:.5rem;">
                     <div style="display:flex; gap:.65rem; align-items:center;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                        <strong>{{ geoErrors.length }} endereço(s) com problema:</strong>
+                        <strong style="font-size:.78rem;">{{ geoErrors.length }} endereço(s) não localizados no mapa</strong>
                     </div>
-                    <div style="padding-left:1.5rem;">
-                        <div v-for="err in geoErrors" :key="err.index" style="margin-bottom:.4rem;">
-                            <span style="color:var(--c-txt); font-weight:600;">{{ err.address }}</span>
-                            <br>
-                            <span style="color:#9a4040; font-size:.7rem;">{{ err.message }}</span>
+                    <div style="padding-left:1.5rem; display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:.4rem;">
+                        <div v-for="err in geoErrors" :key="err.index" class="err-item">
+                            <span style="color:var(--c-txt); font-weight:700; font-size:.7rem; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ err.address }}</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Timeline -->
                 <div class="timeline-wrap">
-                    <div style="font-size:.85rem; font-weight:800; color:var(--c-accent); text-transform:uppercase; letter-spacing:.05em; margin-bottom:.8rem; padding-bottom:.4rem; border-bottom:1px solid var(--c-border);">
-                        Rota para Motoboy {{ activeBlockIndex + 1 }}
-                    </div>
-                    
-                    <!-- Origin -->
-                    <div class="origin-row">
-                        <div class="o-connector">
-                            <div class="o-dot">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    <div style="font-size:.78rem; font-weight:800; color:var(--c-accent); text-transform:uppercase; letter-spacing:.05em; margin-bottom:1rem; padding-bottom:.5rem; border-bottom:2.5px solid var(--c-border); display:flex; justify-content:space-between; align-items:center;">
+                        <span>Itinerário Detalhado</span>
+                        <div style="display:flex; align-items:center; gap:1rem;">
+                            <div class="segment-track" style="transform:scale(0.85); transform-origin:right;">
+                                <button @click="isOptimizedView = false" class="seg-btn" :class="{ 'seg-active': !isOptimizedView }">Original</button>
+                                <button @click="isOptimizedView = true"  class="seg-btn" :class="{ 'seg-opt': isOptimizedView }">Otimizada</button>
                             </div>
-                            <div class="o-line"></div>
-                        </div>
-                        <div>
-                            <div class="o-eyebrow">Ponto de Partida</div>
-                            <div class="o-name">Recanto da Feijoada</div>
-                            <div class="o-sub">R. Brasílio Martinho Vale, 46 — Farolândia, Aracaju</div>
+                            <div style="background:var(--c-bg-2); padding:2px 8px; border-radius:99px; font-size:.65rem; color:var(--c-txt-3);">{{ currentViewList.length }} paradas</div>
                         </div>
                     </div>
 
                     <!-- Stops -->
-                    <div v-for="(node, idx) in currentViewList" :key="idx + '-' + node.address" class="stop-row">
-                        <div class="s-track">
-                            <div class="s-dot"></div>
-                            <div v-if="idx < currentViewList.length - 1" class="s-line"></div>
-                        </div>
-                        <div class="stop-pill">
-                            <div style="flex:1;min-width:0;">
-                                <div style="display:flex; align-items:center; gap:0.4rem;">
-                                    <div class="s-badge" :class="{ 'badge-error': node.not_found }">
-                                        {{ node.not_found ? 'Ponto não localizado' : 'Parada ' + (idx + 1) }}
-                                    </div>
-                                    <span v-if="node.not_found" style="font-size:0.6rem; color:#d97706; font-weight:600; display:flex; align-items:center; gap:2px;">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                                        Confirmar no Maps
-                                    </span>
-                                </div>
-                                <div class="s-addr" :style="node.not_found ? 'color:var(--c-txt-3); font-style:italic;' : ''">{{ node.address }}</div>
-                                <div v-if="node.complement" class="s-comp">{{ node.complement }}</div>
+                    <div v-for="(node, idx) in currentViewList" :key="idx + '-' + node.address" class="stop-row" :style="idx % 2 === 0 ? '' : 'background:rgba(0,0,0,0.015);'">
+                        <div class="s-num">{{ idx + 1 }}</div>
+                        <div class="s-info">
+                            <div class="s-badge" :class="{ 'badge-error': node.not_found }">
+                                {{ node.not_found ? 'Localizar Manualmente' : 'Entrega ' + (idx + 1) }}
                             </div>
-                            <div class="s-qty-box">
-                                <div class="s-qty-num">{{ node.amount }}</div>
-                                <div class="s-qty-lbl">feij.</div>
+                            <div class="s-addr" :style="node.not_found ? 'color:var(--c-red);' : ''">{{ node.address }}</div>
+                            <div v-if="node.complement" class="s-comp">{{ node.complement }}</div>
+                            <div v-if="node.not_found" class="s-meta" style="background:rgba(220,38,38,.08); color:var(--c-red); font-size:.62rem; padding:3px 8px; border-radius:6px; display:inline-flex; align-items:center; gap:5px; margin-top:6px; border:1px solid rgba(220,38,38,.1);">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                Endereço não encontrado nas coordenadas automáticas
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Export -->
-                <div class="export-row">
-                    <span class="export-label">Exportar</span>
-                    <div class="export-actions">
-                        <button class="export-btn eb-gm" @click="exportGoogleMaps">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-                            Maps
-                        </button>
-                        <button class="export-btn eb-wa" @click="exportWhatsApp">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                            WhatsApp
-                        </button>
-                        <button class="export-btn" @click="exportClipboard">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>
-                            Copiar
-                        </button>
-                        <button class="export-btn" @click="exportCSV">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
-                            CSV
-                        </button>
-                        <button class="export-btn" @click="exportPrint">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
-                            Imprimir
-                        </button>
+                        <div class="s-qty-box">
+                            <span class="s-qty-val">{{ node.amount }}</span>
+                            <span class="s-qty-lab">Feij.</span>
+                        </div>
                     </div>
                 </div>
 

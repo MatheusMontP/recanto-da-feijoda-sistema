@@ -196,6 +196,14 @@ const App = {
             refreshIcons(nextTick);
         }
 
+        const toggleManualDistance = () => {
+            if (manualDistance.value === null) {
+                manualDistance.value = currentDistance.value;
+            } else {
+                manualDistance.value = null;
+            }
+        };
+
         function addOrder() {
             if (!newAddress.value.trim() || newAmount.value < 1) return;
             if (orders.value.length >= 15) return;
