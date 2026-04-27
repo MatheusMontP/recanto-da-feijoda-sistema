@@ -1,12 +1,14 @@
 import os
 import logging
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
 
 from .api.endpoints import delivery
-from .core.config import FRONTEND_DIR
+from .core.config import CORS_ORIGINS, FRONTEND_DIR
+from .core.errors import http_exception_handler, unhandled_exception_handler, validation_exception_handler
 from .db.cache import init_db
 
 # Logging
@@ -24,11 +26,15 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=CORS_ORIGINS,
     allow_credentials=False,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization"],
 )
+
+app.add_exception_handler(HTTPException, http_exception_handler)
+app.add_exception_handler(RequestValidationError, validation_exception_handler)
+app.add_exception_handler(Exception, unhandled_exception_handler)
 
 # Include Routers
 app.include_router(delivery.router, prefix="/api")

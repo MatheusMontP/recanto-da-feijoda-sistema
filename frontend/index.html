@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Recanto da Feijoada — Sistema de Roteirização de Entregas">
     <title>Recanto da Feijoada · Roteirizador</title>
 
@@ -95,6 +95,11 @@
             min-height: 100dvh;
         }
         button { font-family: inherit; cursor: pointer; border: none; background: none; }
+        button:focus-visible,
+        input:focus-visible {
+            outline: 3px solid rgba(37,99,235,.85);
+            outline-offset: 2px;
+        }
         input[type=number]::-webkit-inner-spin-button,
         input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
         input[type=number] { -moz-appearance:textfield; }
@@ -232,10 +237,10 @@
         .counter {
             display: flex; align-items: center;
             border: 1.5px solid var(--c-border2); border-radius: var(--r-md);
-            background: var(--c-bg); height: 40px; overflow: hidden;
+            background: var(--c-bg); min-height: 44px; overflow: hidden;
         }
         .counter-btn {
-            width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;
+            width: 44px; min-height: 44px; display: flex; align-items: center; justify-content: center;
             font-size: 1.1rem; color: var(--c-txt-2);
             transition: background .12s, color .12s;
         }
@@ -306,7 +311,7 @@
         .order-sub  { font-size:.67rem; color:var(--c-txt-3); margin-top:.02rem; }
         .row-actions { display:flex; gap:1px; flex-shrink:0; }
         .act-btn {
-            width:26px; height:26px; border-radius:6px;
+            min-width:32px; min-height:32px; border-radius:6px;
             display:flex; align-items:center; justify-content:center;
             color: var(--c-txt-3); transition: all .12s;
         }
@@ -466,6 +471,117 @@
         .seg-btn.seg-active { background:var(--c-surface); color:var(--c-txt); box-shadow:var(--sh-sm); }
         .seg-btn.seg-opt    { background:var(--c-accent); color:#fff; box-shadow:0 2px 6px rgba(212,98,26,.3); }
 
+        .route-view-header {
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:1rem;
+            padding:.85rem 1rem;
+            margin-bottom:.8rem;
+            background:var(--c-surface);
+            border:1.5px solid var(--c-border);
+            border-left:4px solid var(--c-accent);
+            border-radius:var(--r-lg);
+            box-shadow:var(--sh-sm);
+        }
+        .route-view-title {
+            display:flex;
+            flex-direction:column;
+            gap:.15rem;
+            min-width:0;
+        }
+        .route-view-title strong {
+            font-size:.78rem;
+            font-weight:800;
+            color:var(--c-accent);
+            text-transform:uppercase;
+            letter-spacing:.05em;
+        }
+        .route-view-title span {
+            font-size:.7rem;
+            color:var(--c-txt-3);
+            font-weight:600;
+        }
+        .route-view-switch {
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:.35rem;
+            padding:.25rem;
+            min-width:260px;
+            background:var(--c-bg-2);
+            border:1px solid var(--c-border2);
+            border-radius:var(--r-md);
+        }
+        .route-mode-btn {
+            justify-content:center;
+            min-height:44px;
+            padding:.55rem .85rem;
+            border-radius:var(--r-sm);
+            font-size:.78rem;
+            font-weight:800;
+            color:var(--c-txt-2);
+        }
+        .route-mode-btn.is-active-original {
+            background:var(--c-dark);
+            color:#fff;
+            box-shadow:0 4px 10px rgba(40,21,10,.18);
+        }
+        .route-mode-btn.is-active-optimized {
+            background:var(--c-accent);
+            color:#fff;
+            box-shadow:0 4px 12px rgba(212,98,26,.35);
+        }
+        .route-count-pill {
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            width:max-content;
+            background:var(--c-bg-2);
+            border:1px solid var(--c-border);
+            padding:.15rem .55rem;
+            border-radius:99px;
+            font-size:.65rem;
+            color:var(--c-txt-3);
+            font-weight:700;
+        }
+        .timeline-wrap > div:first-child {
+            background:var(--c-surface) !important;
+            border:1.5px solid var(--c-border) !important;
+            border-left:4px solid var(--c-accent) !important;
+            border-radius:var(--r-lg) !important;
+            box-shadow:var(--sh-sm) !important;
+            padding:.85rem 1rem !important;
+            margin-bottom:.9rem !important;
+        }
+        .timeline-wrap .segment-track[aria-label] {
+            min-width:260px;
+            transform:none !important;
+            padding:.25rem;
+            gap:.35rem;
+            border:1px solid var(--c-border2);
+            border-radius:var(--r-md);
+            background:var(--c-bg-2);
+        }
+        .timeline-wrap .segment-track[aria-label] .seg-btn {
+            min-height:44px;
+            flex:1;
+            justify-content:center;
+            border-radius:var(--r-sm);
+            font-size:.78rem;
+            font-weight:800;
+            padding:.55rem .85rem;
+        }
+        .timeline-wrap .segment-track[aria-label] .seg-btn.seg-active {
+            background:var(--c-dark);
+            color:#fff;
+            box-shadow:0 4px 10px rgba(40,21,10,.18);
+        }
+        .timeline-wrap .segment-track[aria-label] .seg-btn.seg-opt {
+            background:var(--c-accent);
+            color:#fff;
+            box-shadow:0 4px 12px rgba(212,98,26,.35);
+        }
+
         /* Error Banner */
         .err-bar {
             flex-shrink:0;
@@ -504,6 +620,48 @@
         .badge-error { background:rgba(220,38,38,.1); color:var(--c-red); }
         .s-addr { font-size:.95rem; font-weight:700; color:var(--c-txt); line-height:1.2; word-break:break-word; }
         .s-comp { font-size:.75rem; color:var(--c-txt-3); margin-top:.15rem; }
+        .manual-location-box {
+            margin-top:.65rem;
+            padding:.65rem;
+            background:rgba(220,38,38,.06);
+            border:1px solid rgba(220,38,38,.16);
+            border-radius:var(--r-md);
+        }
+        .manual-location-note {
+            display:flex;
+            align-items:center;
+            gap:.4rem;
+            color:var(--c-red);
+            font-size:.68rem;
+            font-weight:700;
+            line-height:1.35;
+        }
+        .manual-location-actions {
+            display:flex;
+            gap:.45rem;
+            flex-wrap:wrap;
+            margin-top:.55rem;
+        }
+        .manual-action-btn {
+            min-height:36px;
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            gap:.35rem;
+            padding:.35rem .65rem;
+            border-radius:var(--r-sm);
+            font-size:.68rem;
+            font-weight:800;
+            border:1px solid rgba(220,38,38,.2);
+            background:var(--c-surface);
+            color:var(--c-red);
+            transition:all .15s var(--ease);
+        }
+        .manual-action-btn:hover {
+            background:var(--c-red);
+            color:#fff;
+            border-color:var(--c-red);
+        }
         
         .s-qty-box {
             background:var(--c-dark); color:#fff;
@@ -640,9 +798,15 @@
             .ea-icon { width: 32px; height: 32px; border-radius: 8px; }
             .ea-title { font-size: .78rem; }
             .ea-desc { font-size: .58rem; }
+            .route-view-header { flex-direction:column; align-items:stretch; gap:.65rem; }
+            .route-view-switch { min-width:0; width:100%; }
+            .timeline-wrap > div:first-child { flex-direction:column; align-items:stretch !important; gap:.65rem; }
+            .timeline-wrap > div:first-child > div { width:100%; flex-direction:column; align-items:stretch !important; gap:.55rem !important; }
+            .timeline-wrap .segment-track[aria-label] { min-width:0; width:100%; }
 
             /* Toast */
             .toast { left:1rem; right:1rem; bottom:1rem; justify-content:center; }
+            .act-btn { min-width:40px; min-height:40px; }
 
             /* Results layout padding */
             .results-layout { padding:.65rem; }
@@ -651,6 +815,7 @@
         @media (min-width: 769px) {
             .workspace.has-results .left-pane  { /* stays same */ }
         }
+
     </style>
 </head>
 
@@ -669,7 +834,7 @@
             <img src="./assets/logo.jpg" alt="Origem">
             <span class="nav-origin-text">Farolândia, Aracaju</span>
         </div>
-        <button class="dark-btn" @click="toggleDark" :title="isDark ? 'Modo Claro' : 'Modo Escuro'">
+        <button class="dark-btn" @click="toggleDark" :title="isDark ? 'Modo Claro' : 'Modo Escuro'" :aria-label="isDark ? 'Ativar modo claro' : 'Ativar modo escuro'" :aria-pressed="isDark">
             <svg v-if="isDark" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
             <svg v-else xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
         </button>
@@ -690,9 +855,10 @@
             </div>
 
             <!-- Tabs Entregadores -->
-            <div style="margin:.75rem .75rem 0; display:flex; gap:2px; background:var(--c-border); padding:2px; border-radius:var(--r-md);">
+            <div role="tablist" aria-label="Selecionar motoboy" style="margin:.75rem .75rem 0; display:flex; gap:2px; background:var(--c-border); padding:2px; border-radius:var(--r-md);">
                 <button v-for="(b, i) in blocks" :key="i" @click="activeBlockIndex = i" 
                     class="seg-btn" :class="{ 'seg-active': activeBlockIndex === i }"
+                    role="tab" :aria-selected="activeBlockIndex === i" :aria-label="'Motoboy ' + (i + 1) + ', ' + b.orders.length + ' paradas'"
                     style="flex:1; justify-content:center; padding:.4rem 0;">
                     Motoboy {{ i + 1 }}
                     <span v-if="b.orders.length > 0" 
@@ -718,9 +884,9 @@
                     <div class="qty-row field-gap">
                         <span class="qty-label">Qtd. Feijoadas</span>
                         <div class="counter">
-                            <button type="button" class="counter-btn" @click="decrementAmount">−</button>
-                            <input v-model.number="newAmount" type="number" min="1" class="counter-val">
-                            <button type="button" class="counter-btn" @click="incrementAmount">+</button>
+                            <button type="button" class="counter-btn" @click="decrementAmount" aria-label="Diminuir quantidade">−</button>
+                            <input v-model.number="newAmount" type="number" min="1" class="counter-val" aria-label="Quantidade de feijoadas">
+                            <button type="button" class="counter-btn" @click="incrementAmount" aria-label="Aumentar quantidade">+</button>
                         </div>
                     </div>
                     <div class="btn-add-wrap">
@@ -736,7 +902,7 @@
             <div class="order-list-header">
                 <span class="order-list-title">Lista Motoboy {{ activeBlockIndex + 1 }}</span>
                 <span class="badge" :class="orders.length > 0 ? 'badge-accent' : ''">{{ orders.length }}/12</span>
-                <button v-if="orders.length > 0" @click="clearBlock" class="btn-ghost">Limpar</button>
+                <button v-if="orders.length > 0" @click="clearBlock" class="btn-ghost" aria-label="Limpar lista do motoboy atual">Limpar</button>
             </div>
 
             <!-- Order Scroll -->
@@ -757,16 +923,16 @@
                             <div class="order-meta">{{ o.amount }}× Feijoada</div>
                         </div>
                         <div class="row-actions">
-                            <button @click="moveUp(idx)"   :disabled="idx === 0"                  class="act-btn" title="Subir">
+                            <button @click="moveUp(idx)"   :disabled="idx === 0"                  class="act-btn" title="Subir" :aria-label="'Mover parada ' + (idx + 1) + ' para cima'">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
                             </button>
-                            <button @click="moveDown(idx)" :disabled="idx === orders.length - 1" class="act-btn" title="Descer">
+                            <button @click="moveDown(idx)" :disabled="idx === orders.length - 1" class="act-btn" title="Descer" :aria-label="'Mover parada ' + (idx + 1) + ' para baixo'">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
                             </button>
-                            <button @click="startEdit(idx)" class="act-btn" title="Editar">
+                            <button @click="startEdit(idx)" class="act-btn" title="Editar" :aria-label="'Editar parada ' + (idx + 1)">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
                             </button>
-                            <button @click="removeOrder(idx)" class="act-btn act-btn-danger" title="Remover">
+                            <button @click="removeOrder(idx)" class="act-btn act-btn-danger" title="Remover" :aria-label="'Remover parada ' + (idx + 1)">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                             </button>
                         </div>
@@ -774,16 +940,16 @@
                     <!-- EDIT -->
                     <template v-else>
                         <div class="edit-block">
-                            <input v-model="editAddress" type="text" class="text-input" style="font-size:16px;" placeholder="Rua, Número, Bairro, Aracaju">
-                            <input v-model="editComplement" type="text" class="text-input" style="font-size:16px;" placeholder="Complemento (opcional)">
+                            <input v-model="editAddress" type="text" class="text-input" style="font-size:16px;" placeholder="Rua, Número, Bairro, Aracaju" :aria-label="'Endereço da parada ' + (idx + 1)">
+                            <input v-model="editComplement" type="text" class="text-input" style="font-size:16px;" placeholder="Complemento (opcional)" :aria-label="'Complemento da parada ' + (idx + 1)">
                             <div class="edit-row">
-                                <div class="counter" style="height:36px;">
-                                    <button type="button" class="counter-btn" @click="editAmount > 1 ? editAmount-- : null" style="width:36px;height:36px;">−</button>
-                                    <input v-model.number="editAmount" type="number" min="1" class="counter-val" style="font-size:16px;">
-                                    <button type="button" class="counter-btn" @click="editAmount++" style="width:36px;height:36px;">+</button>
+                                <div class="counter" style="min-height:44px;">
+                                    <button type="button" class="counter-btn" @click="editAmount > 1 ? editAmount-- : null" style="width:44px;min-height:44px;" :aria-label="'Diminuir quantidade da parada ' + (idx + 1)">−</button>
+                                    <input v-model.number="editAmount" type="number" min="1" class="counter-val" style="font-size:16px;" :aria-label="'Quantidade da parada ' + (idx + 1)">
+                                    <button type="button" class="counter-btn" @click="editAmount++" style="width:44px;min-height:44px;" :aria-label="'Aumentar quantidade da parada ' + (idx + 1)">+</button>
                                 </div>
                                 <button @click="saveEdit" class="btn-save" style="flex:1;">Salvar</button>
-                                <button @click="cancelEdit" class="act-btn act-btn-danger" title="Cancelar">
+                                <button @click="cancelEdit" class="act-btn act-btn-danger" title="Cancelar" :aria-label="'Cancelar edição da parada ' + (idx + 1)">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                                 </button>
                             </div>
@@ -804,19 +970,21 @@
                         <span style="font-size:.78rem; font-weight:600; color:var(--c-txt);">Retornar ao restaurante?</span>
                         <span style="font-size:.65rem; color:var(--c-txt-3);">Soma a volta no cálculo do KM</span>
                     </div>
-                    <div style="display:flex; background:var(--c-border); padding:2px; border-radius:var(--r-sm); gap:2px;">
+                    <div role="group" aria-label="Retornar ao restaurante" style="display:flex; background:var(--c-border); padding:2px; border-radius:var(--r-sm); gap:2px;">
                         <button @click="returnToOrigin = true" 
                             :class="returnToOrigin ? 'seg-active' : ''"
+                            :aria-pressed="returnToOrigin"
                             class="seg-btn" style="padding:.3rem .8rem; font-size:.7rem;">Sim</button>
                         <button @click="returnToOrigin = false" 
                             :class="!returnToOrigin ? 'seg-active' : ''"
+                            :aria-pressed="!returnToOrigin"
                             class="seg-btn" style="padding:.3rem .8rem; font-size:.7rem;">Não</button>
                     </div>
                 </div>
             </div>
 
             <!-- Progress UX -->
-            <div v-if="isProcessing" class="progress-container" style="margin:.75rem .75rem 0; padding:.85rem; background:rgba(212,98,26,.05); border:1px solid rgba(212,98,26,.15); border-radius:var(--r-md);">
+            <div v-if="isProcessing" class="progress-container" aria-live="polite" style="margin:.75rem .75rem 0; padding:.85rem; background:rgba(212,98,26,.05); border:1px solid rgba(212,98,26,.15); border-radius:var(--r-md);">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:.5rem;">
                     <span style="font-size:.7rem; font-weight:700; color:var(--c-accent); text-transform:uppercase; letter-spacing:.05em;">{{ progressStatus }}</span>
                     <span style="font-size:.75rem; font-weight:800; color:var(--c-txt);">{{ progressPercentage }}%</span>
@@ -848,7 +1016,7 @@
         <main class="right-pane">
 
             <!-- Error from fetch -->
-            <div v-if="errorMessage" class="err-bar" style="margin:.75rem .75rem 0; flex-shrink:0;">
+            <div v-if="errorMessage" class="err-bar" role="alert" aria-live="assertive" style="margin:.75rem .75rem 0; flex-shrink:0;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                 <div>
                     <strong>Erro ao processar</strong>
@@ -866,7 +1034,7 @@
             </div>
 
             <!-- Processing -->
-            <div v-if="isProcessing" class="center-state">
+            <div v-if="isProcessing" class="center-state" aria-live="polite">
                 <div style="width: 100%; max-width: 300px; text-align: center;">
                     <!-- Novo Progress Circle/Bar -->
                     <div style="position: relative; width: 80px; height: 80px; margin: 0 auto 1.5rem;">
@@ -912,7 +1080,7 @@
                 <!-- Export Actions restored -->
                 <div class="export-grid-card">
                     <div class="export-actions-grid">
-                        <button class="export-action-btn ea-gm" @click="exportGoogleMaps">
+                        <button class="export-action-btn ea-gm" @click="exportGoogleMaps" aria-label="Abrir rota no Google Maps">
                             <div class="ea-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg></div>
                             <div class="ea-text">
                                 <span class="ea-title">Google Maps</span>
@@ -920,7 +1088,7 @@
                             </div>
                         </button>
                         
-                        <button class="export-action-btn ea-wa" @click="exportWhatsApp">
+                        <button class="export-action-btn ea-wa" @click="exportWhatsApp" aria-label="Enviar rota pelo WhatsApp">
                             <div class="ea-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
                             <div class="ea-text">
                                 <span class="ea-title">WhatsApp</span>
@@ -928,7 +1096,7 @@
                             </div>
                         </button>
 
-                        <button class="export-action-btn ea-cp" @click="exportClipboard">
+                        <button class="export-action-btn ea-cp" @click="exportClipboard" aria-label="Copiar rota em texto formatado">
                             <div class="ea-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg></div>
                             <div class="ea-text">
                                 <span class="ea-title">Copiar Rota</span>
@@ -936,7 +1104,7 @@
                             </div>
                         </button>
 
-                        <button class="export-action-btn ea-ex" @click="exportCSV">
+                        <button class="export-action-btn ea-ex" @click="exportCSV" aria-label="Exportar rota em CSV">
                             <div class="ea-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg></div>
                             <div class="ea-text">
                                 <span class="ea-title">Excel / CSV</span>
@@ -944,7 +1112,7 @@
                             </div>
                         </button>
 
-                        <button class="export-action-btn ea-pr" @click="exportPrint">
+                        <button class="export-action-btn ea-pr" @click="exportPrint" aria-label="Imprimir cupom da rota">
                             <div class="ea-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg></div>
                             <div class="ea-text">
                                 <span class="ea-title">Imprimir</span>
@@ -972,9 +1140,9 @@
                     <div style="font-size:.78rem; font-weight:800; color:var(--c-accent); text-transform:uppercase; letter-spacing:.05em; margin-bottom:1rem; padding-bottom:.5rem; border-bottom:2.5px solid var(--c-border); display:flex; justify-content:space-between; align-items:center;">
                         <span>Itinerário Detalhado</span>
                         <div style="display:flex; align-items:center; gap:1rem;">
-                            <div class="segment-track" style="transform:scale(0.85); transform-origin:right;">
-                                <button @click="isOptimizedView = false" class="seg-btn" :class="{ 'seg-active': !isOptimizedView }">Original</button>
-                                <button @click="isOptimizedView = true"  class="seg-btn" :class="{ 'seg-opt': isOptimizedView }">Otimizada</button>
+                            <div class="segment-track" role="group" aria-label="Tipo de itinerário" style="transform:scale(0.85); transform-origin:right;">
+                                <button @click="isOptimizedView = false" class="seg-btn" :class="{ 'seg-active': !isOptimizedView }" :aria-pressed="!isOptimizedView">Original</button>
+                                <button @click="isOptimizedView = true"  class="seg-btn" :class="{ 'seg-opt': isOptimizedView }" :aria-pressed="isOptimizedView">Otimizada</button>
                             </div>
                             <div style="background:var(--c-bg-2); padding:2px 8px; border-radius:99px; font-size:.65rem; color:var(--c-txt-3);">{{ currentViewList.length }} paradas</div>
                         </div>
@@ -989,9 +1157,19 @@
                             </div>
                             <div class="s-addr" :style="node.not_found ? 'color:var(--c-red);' : ''">{{ node.address }}</div>
                             <div v-if="node.complement" class="s-comp">{{ node.complement }}</div>
-                            <div v-if="node.not_found" class="s-meta" style="background:rgba(220,38,38,.08); color:var(--c-red); font-size:.62rem; padding:3px 8px; border-radius:6px; display:inline-flex; align-items:center; gap:5px; margin-top:6px; border:1px solid rgba(220,38,38,.1);">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                                Endereço não encontrado nas coordenadas automáticas
+                            <div v-if="node.not_found" class="manual-location-box">
+                                <div class="manual-location-note">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                    Endereço não encontrado automaticamente. Localize manualmente antes de sair.
+                                </div>
+                                <div class="manual-location-actions">
+                                    <button type="button" class="manual-action-btn" @click="openManualAddress(node)" :aria-label="'Abrir busca manual no Google Maps para ' + node.address">
+                                        Abrir no Maps
+                                    </button>
+                                    <button type="button" class="manual-action-btn" @click="copyManualAddress(node)" :aria-label="'Copiar endereço não localizado ' + node.address">
+                                        Copiar endereço
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         <div class="s-qty-box">
@@ -1007,7 +1185,7 @@
     </div><!-- /workspace -->
 
     <!-- Toast -->
-    <div v-if="toastMessage" class="toast">
+    <div v-if="toastMessage" class="toast" role="status" aria-live="polite">
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
         {{ toastMessage }}
     </div>

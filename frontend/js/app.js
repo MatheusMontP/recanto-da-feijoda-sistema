@@ -3,7 +3,7 @@
  * Main App Entrypoint (ES Modules)
  */
 
-import { processRouteStream as apiProcessRoute, syncGoogleDistance as apiSyncGoogleDistance } from './modules/api.js';
+import { processRouteStream as apiProcessRoute } from './modules/api.js';
 import { refreshIcons, initIconObserver } from './modules/utils.js';
 import { generatePrintReceipt } from './modules/printer.js';
 import * as exporter from './modules/export.js';
@@ -198,7 +198,7 @@ const App = {
 
         function addOrder() {
             if (!newAddress.value.trim() || newAmount.value < 1) return;
-            if (orders.value.length >= 15) return;
+            if (orders.value.length >= 12) return;
             orders.value.push({ address: newAddress.value.trim(), complement: newComplement.value.trim(), amount: newAmount.value });
             newAddress.value = ""; newComplement.value = ""; newAmount.value = 1;
             errorMessage.value = "";
@@ -249,6 +249,9 @@ const App = {
                 }
             } catch (e) {
                 errorMessage.value = e.message;
+                if (e.code === "RATE_LIMIT_EXCEEDED") {
+                    showToast("Muitas tentativas em sequência");
+                }
             } finally {
                 isProcessing.value = false;
                 refreshIcons(nextTick);
@@ -284,6 +287,24 @@ const App = {
             exporter.exportGoogleMaps(currentViewList.value, returnToOrigin.value);
             showToast("Abrindo Google Maps…");
         }
+
+        function manualAddressText(node) {
+            let address = node.address || "";
+            if (!address.toLowerCase().includes("aracaju")) {
+                address += ", Aracaju - SE";
+            }
+            return node.complement ? `${address} (${node.complement})` : address;
+        }
+
+        function openManualAddress(node) {
+            const query = encodeURIComponent(manualAddressText(node));
+            window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, "_blank");
+            showToast("Abrindo busca no Maps...");
+        }
+
+        function copyManualAddress(node) {
+            exporter.exportClipboard(manualAddressText(node)).then(() => showToast("Endereço copiado!"));
+        }
         loadState();
 
         return {
@@ -293,6 +314,7 @@ const App = {
             editingIndex, editAddress, editComplement, editAmount, startEdit, cancelEdit, saveEdit,
             moveUp, moveDown, addOrder, processRoute, toggleManualDistance, isSyncing,
             exportWhatsApp, exportClipboard, exportCSV, exportPrint, exportGoogleMaps,
+            openManualAddress, copyManualAddress,
             decrementAmount: () => { if (newAmount.value > 1) newAmount.value--; },
             incrementAmount: () => { newAmount.value++; },
             removeOrder: (idx) => { orders.value.splice(idx, 1); results.value = null; refreshIcons(nextTick); },

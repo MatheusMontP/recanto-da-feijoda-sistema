@@ -1,12 +1,13 @@
 import sys
 import os
+import asyncio
 
 # Add backend to path
 sys.path.append(os.path.join(os.getcwd(), "backend"))
 
 from app.services.geocoder import geocode_address
 
-def test_geocoding():
+async def test_geocoding():
     addresses = [
         "R. Brasílio Martinho Vale, 46 - Farolândia, Aracaju - SE",
         "Rua Maria Vasconcelos de Andrade, 500, Aruana, Aracaju",
@@ -14,14 +15,14 @@ def test_geocoding():
         "Avenida Murilo Dantas, 800, Farolândia, Aracaju"
     ]
     for addr in addresses:
-        res = geocode_address(addr)
+        res = await geocode_address(addr)
         if res:
             print(f"Address: {addr}")
             print(f"  Coords: ({res['lat']}, {res['lon']})")
             print(f"  Display: {res['display_name']}")
-            print(f"  Type: {res['type']} | Importance: {res['importance']}")
+            print(f"  Type: {res['type']} | Weak: {res.get('weak', False)}")
         else:
             print(f"FAILED: {addr}")
 
 if __name__ == "__main__":
-    test_geocoding()
+    asyncio.run(test_geocoding())

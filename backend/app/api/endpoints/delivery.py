@@ -1,17 +1,16 @@
-import logging
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 import json
 import asyncio
 from ...models.schemas import RouteRequest, RouteResponse, RouteSummary, RouteResult, GeoError, SyncRequest, SyncResponse
 from ...core.config import RESTAURANTE_COORDS
+from ...core.rate_limit import enforce_api_rate_limit
 from ...services.geocoder import geocode_address
 from ...services.router_engine import build_distance_matrix, compute_route_distance, optimize_route_exact
-from ...utils.geo import _strip_accents, haversine
+from ...utils.geo import _strip_accents
 from ...utils.google_maps import get_google_maps_distance_async
 
-router = APIRouter()
-logger = logging.getLogger("lucromaximo")
+router = APIRouter(dependencies=[Depends(enforce_api_rate_limit)])
 
 @router.post("/optimize_route", response_model=RouteResponse)
 async def optimize_route_endpoint(req: RouteRequest):
@@ -62,7 +61,7 @@ async def optimize_route_endpoint(req: RouteRequest):
 
     # 3. Otimizar
     if nodes_found:
-        dur_matrix, dist_matrix = build_distance_matrix(origin, nodes_found)
+        dur_matrix, dist_matrix = await build_distance_matrix(origin, nodes_found)
         cost_matrix = dist_matrix if req.optimize_for == "distance" else dur_matrix
         optimized_indices = optimize_route_exact(cost_matrix, len(nodes_found), req.return_to_origin)
         optimized_dist = compute_route_distance(dist_matrix, optimized_indices, req.return_to_origin)
@@ -150,5 +149,12 @@ async def optimize_route_stream(req: RouteRequest):
 async def sync_google_distance_endpoint(req: SyncRequest):
     dest = req.origin if req.return_to_origin else None
     dist = await get_google_maps_distance_async(req.origin, req.stops, dest)
-    if dist is None: raise HTTPException(status_code=500, detail="Erro no Google Maps.")
+    if dist is None:
+        raise HTTPException(
+            status_code=502,
+            detail={
+                "code": "GOOGLE_DISTANCE_FAILED",
+                "message": "Não foi possível consultar a distância no Google Maps.",
+            },
+        )
     return SyncResponse(distance_km=round(dist, 2))

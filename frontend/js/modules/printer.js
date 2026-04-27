@@ -2,6 +2,16 @@
  * Printer Module - Thermal receipt generation
  */
 
+export function escapeHtml(value) {
+    return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
+    }[char]));
+}
+
 export function generatePrintReceipt(data, blockIndex, isOptimized, currentDistance) {
     const list = isOptimized ? data.optimized.route : data.original.route;
     const optText = isOptimized ? "OTIMIZADA" : "ORIGINAL";
@@ -17,12 +27,14 @@ export function generatePrintReceipt(data, blockIndex, isOptimized, currentDista
     `;
     
     list.forEach((n, i) => {
+        const address = escapeHtml(n.address);
+        const complement = escapeHtml(n.complement);
         stopsHtml += `
         <div class="stop">
             <b>[${i+1}] ${n.amount}x FEIJ.</b><br>
-            ${n.address}
+            ${address}
             ${n.not_found ? '<br><b style="color:#000">[!] LOCALIZAR MANUALMENTE</b>' : ""}
-            ${n.complement ? `<br><i>Comp: ${n.complement}</i>` : ""}
+            ${n.complement ? `<br><i>Comp: ${complement}</i>` : ""}
         </div>
         <div class="divider">--------------------------------</div>
         `;
