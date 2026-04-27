@@ -3,3 +3,4 @@ uvicorn
 geopy
 pydantic
 requests
+aiohttp

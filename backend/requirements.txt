@@ -2,3 +2,5 @@ fastapi
 uvicorn
 geopy
 pydantic
+requests
+aiohttp

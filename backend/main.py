@@ -2,7 +2,12 @@
 LucroMáximo Logistics — Entrypoint
 Este arquivo atua como um wrapper para a nova arquitetura modular.
 """
-from app.main import app
+try:
+    # Render/start command from repo root: uvicorn backend.main:app
+    from .app.main import app
+except ImportError:
+    # Local start from backend/: uvicorn main:app
+    from app.main import app
 
 if __name__ == "__main__":
     import uvicorn
