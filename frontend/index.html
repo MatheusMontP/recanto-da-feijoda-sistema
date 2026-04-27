@@ -84,6 +84,7 @@
 
         /* ─── RESET ──────────────────────────────────── */
         *,*::before,*::after { box-sizing: border-box; margin:0; padding:0; }
+        [v-cloak] { display: none !important; }
         html,body { overflow-x:hidden; height:100%; }
         html { font-size:16px; scroll-behavior:smooth; }
         body {
@@ -654,7 +655,7 @@
 </head>
 
 <body>
-<div id="app" class="app-shell">
+<div id="app" class="app-shell" v-cloak>
 
     <!-- ═══ NAVBAR ════════════════════════════════════ -->
     <nav class="navbar">

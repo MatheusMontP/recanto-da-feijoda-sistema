@@ -101,14 +101,6 @@ const App = {
             set: (val) => { blocks.value[activeBlockIndex.value].progressMessage = val; }
         });
 
-        function toggleManualDistance() {
-            if (manualDistance.value === null) {
-                manualDistance.value = currentDistance.value;
-            } else {
-                manualDistance.value = null;
-            }
-        }
-
         // ── Dark mode ──
         const isDark = ref(localStorage.getItem("recanto-dark") === "true");
         if (isDark.value) document.documentElement.classList.add("dark");
