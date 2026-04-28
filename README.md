@@ -4,6 +4,26 @@ Sistema local de roteirizacao de entregas com FastAPI, Vue 3 via CDN, cache SQLi
 
 ## Rodar Localmente
 
+Use o atalho padrao:
+
+```powershell
+.\iniciar.bat
+```
+
+Ele libera a porta `8000`, inicia o servidor e abre a aplicacao em:
+
+```text
+http://127.0.0.1:8000/app/
+```
+
+Se o servidor nao subir, veja os logs:
+
+```text
+uvicorn.out.log
+```
+
+Comando manual equivalente:
+
 ```powershell
 .\venv\Scripts\python.exe -m uvicorn backend.main:app --host 127.0.0.1 --port 8000
 ```
@@ -18,12 +38,6 @@ Documentacao interativa da API:
 
 ```text
 http://127.0.0.1:8000/docs
-```
-
-Tambem existe o atalho:
-
-```powershell
-.\iniciar.bat
 ```
 
 ## Testes

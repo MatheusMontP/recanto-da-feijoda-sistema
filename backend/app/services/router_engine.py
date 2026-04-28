@@ -7,7 +7,7 @@ from ..utils.geo import _strip_accents, haversine
 
 logger = logging.getLogger("lucromaximo")
 
-PRIMARY_PRIORITY_NEIGHBORHOODS = ("farolandia", "augusto franco")
+PRIMARY_PRIORITY_NEIGHBORHOODS = ("farolandia",)
 SECONDARY_PRIORITY_NEIGHBORHOODS = ("atalaia", "coroa do meio", "sao conrado", "aeroporto")
 CLUSTER_NEIGHBORHOODS = (
     "santa maria",
@@ -206,3 +206,26 @@ def optimize_route_exact(matrix: list[list[float]], num_nodes: int, return_to_or
         curr_S = curr_S ^ (1 << curr_node)
         curr_node = prev_node
     return list(reversed(route))
+
+
+def optimize_route_localized(matrix: list[list[float]], num_nodes: int, return_to_origin: bool = True) -> list[int]:
+    """Monta a rota favorecendo continuidade local entre paradas.
+
+    O TSP exato minimiza o total global, mas em entrega urbana isso pode gerar
+    saltos pouco naturais. Aqui a primeira parada ainda usa os vieses da matriz
+    e as próximas seguem sempre o menor custo a partir da parada atual.
+    """
+    if num_nodes <= 0:
+        return []
+
+    remaining = set(range(1, num_nodes + 1))
+    route = []
+    current = 0
+
+    while remaining:
+        next_node = min(remaining, key=lambda idx: matrix[current][idx])
+        route.append(next_node)
+        remaining.remove(next_node)
+        current = next_node
+
+    return route

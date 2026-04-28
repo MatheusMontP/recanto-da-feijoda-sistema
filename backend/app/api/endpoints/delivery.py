@@ -2,15 +2,68 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 import json
 import asyncio
+import logging
 from ...models.schemas import RouteRequest, RouteResponse, RouteSummary, RouteResult, GeoError, SyncRequest, SyncResponse
 from ...core.config import RESTAURANTE_COORDS
 from ...core.rate_limit import enforce_api_rate_limit
 from ...services.geocoder import geocode_address
-from ...services.router_engine import build_distance_matrix, compute_route_distance, optimize_route_exact
+from ...services.router_engine import build_distance_matrix, compute_route_distance, optimize_route_localized
 from ...utils.geo import _strip_accents
 from ...utils.google_maps import get_google_maps_distance_async
 
 router = APIRouter(dependencies=[Depends(enforce_api_rate_limit)])
+logger = logging.getLogger("lucromaximo")
+
+
+def _log_geocoded_nodes(nodes_found: list[dict], nodes_not_found: list[dict]):
+    for idx, node in enumerate(nodes_found, 1):
+        logger.info(
+            "route_geo idx=%d status=found lat=%.6f lon=%.6f weak=%s display=%s address=%s",
+            idx,
+            node["lat"],
+            node["lon"],
+            node.get("weak", False),
+            node.get("display_name", ""),
+            node["address"],
+        )
+    for idx, node in enumerate(nodes_not_found, 1):
+        logger.info(
+            "route_geo_missing idx=%d status=manual address=%s",
+            idx,
+            node["address"],
+        )
+
+
+def _log_route_decision(
+    optimized_indices: list[int],
+    nodes_found: list[dict],
+    nodes_not_found: list[dict],
+    distance_km: float,
+    return_to_origin: bool,
+):
+    logger.info(
+        "route_decision total_found=%d total_manual=%d distance_km=%.2f return_to_origin=%s",
+        len(nodes_found),
+        len(nodes_not_found),
+        distance_km,
+        return_to_origin,
+    )
+    for stop_idx, route_idx in enumerate(optimized_indices, 1):
+        node = nodes_found[route_idx - 1]
+        logger.info(
+            "route_stop order=%d source_index=%d lat=%.6f lon=%.6f address=%s",
+            stop_idx,
+            route_idx,
+            node["lat"],
+            node["lon"],
+            node["address"],
+        )
+    for manual_idx, node in enumerate(nodes_not_found, len(optimized_indices) + 1):
+        logger.info(
+            "route_stop order=%d source_index=manual lat=null lon=null address=%s",
+            manual_idx,
+            node["address"],
+        )
 
 @router.post("/optimize_route", response_model=RouteResponse)
 async def optimize_route_endpoint(req: RouteRequest):
@@ -56,14 +109,16 @@ async def optimize_route_endpoint(req: RouteRequest):
 
         nodes_found.append({
             "address": entry["address"], "amount": entry["amount"], "complement": entry["complement"],
-            "lat": res["lat"], "lon": res["lon"], "weak": res.get("weak", False), "not_found": False
+            "lat": res["lat"], "lon": res["lon"], "weak": res.get("weak", False),
+            "display_name": res.get("display_name", ""), "not_found": False
         })
 
     # 3. Otimizar
+    _log_geocoded_nodes(nodes_found, nodes_not_found)
     if nodes_found:
         dur_matrix, dist_matrix = await build_distance_matrix(origin, nodes_found)
         cost_matrix = dist_matrix if req.optimize_for == "distance" else dur_matrix
-        optimized_indices = optimize_route_exact(cost_matrix, len(nodes_found), req.return_to_origin)
+        optimized_indices = optimize_route_localized(cost_matrix, len(nodes_found), req.return_to_origin)
         optimized_dist = compute_route_distance(dist_matrix, optimized_indices, req.return_to_origin)
         optimized_nodes = [nodes_found[idx - 1] for idx in optimized_indices]
         original_indices = list(range(1, len(nodes_found) + 1))
@@ -71,6 +126,9 @@ async def optimize_route_endpoint(req: RouteRequest):
     else:
         optimized_nodes = []
         original_dist = optimized_dist = 0.0
+        optimized_indices = []
+
+    _log_route_decision(optimized_indices, nodes_found, nodes_not_found, optimized_dist, req.return_to_origin)
 
     return RouteResponse(
         summary=RouteSummary(total_stops=len(unique_orders), total_amount=total_amount),
@@ -119,14 +177,16 @@ async def optimize_route_stream(req: RouteRequest):
             else:
                 nodes_found.append({
                     "address": entry["address"], "amount": entry["amount"], "complement": entry["complement"],
-                    "lat": res["lat"], "lon": res["lon"], "weak": res.get("weak", False), "not_found": False
+                    "lat": res["lat"], "lon": res["lon"], "weak": res.get("weak", False),
+                    "display_name": res.get("display_name", ""), "not_found": False
                 })
 
         # Otimização
         yield json.dumps({"step": "optimizing", "message": "Calculando melhor caminho..."}) + "\n"
+        _log_geocoded_nodes(nodes_found, nodes_not_found)
         if nodes_found:
             _, dist_matrix = await build_distance_matrix(origin, nodes_found)
-            optimized_indices = optimize_route_exact(dist_matrix, len(nodes_found), req.return_to_origin)
+            optimized_indices = optimize_route_localized(dist_matrix, len(nodes_found), req.return_to_origin)
             optimized_dist = compute_route_distance(dist_matrix, optimized_indices, req.return_to_origin)
             optimized_nodes = [nodes_found[idx - 1] for idx in optimized_indices]
             original_indices = list(range(1, len(nodes_found) + 1))
@@ -134,6 +194,9 @@ async def optimize_route_stream(req: RouteRequest):
         else:
             optimized_nodes = []
             original_dist = optimized_dist = 0.0
+            optimized_indices = []
+
+        _log_route_decision(optimized_indices, nodes_found, nodes_not_found, optimized_dist, req.return_to_origin)
 
         result = RouteResponse(
             summary=RouteSummary(total_stops=len(unique_orders), total_amount=total_amount),
