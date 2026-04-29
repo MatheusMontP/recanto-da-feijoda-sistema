@@ -7,9 +7,9 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
 
 from .api.endpoints import admin, delivery
-from .core.config import CORS_ORIGINS, FRONTEND_DIR
+from .core.config import CLEAR_CACHE_ON_STARTUP, CORS_ORIGINS, FRONTEND_DIR
 from .core.errors import http_exception_handler, unhandled_exception_handler, validation_exception_handler
-from .db.cache import init_db
+from .db.cache import clear_geocode_cache, init_db
 
 # Logging
 logging.basicConfig(level=logging.INFO)
@@ -17,6 +17,13 @@ logger = logging.getLogger("lucromaximo")
 
 # Initialize Cache DB
 init_db()
+if CLEAR_CACHE_ON_STARTUP:
+    result = clear_geocode_cache()
+    logger.warning(
+        "startup_cache_clear deleted_rows=%d memory_entries=%d",
+        result["deleted_rows"],
+        result["memory_entries"],
+    )
 
 app = FastAPI(
     title="LucroMáximo Logistics",

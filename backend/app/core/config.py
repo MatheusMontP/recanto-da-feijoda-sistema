@@ -22,6 +22,7 @@ CORS_ORIGINS = _parse_csv_env(
 RATE_LIMIT_REQUESTS = int(os.getenv("RATE_LIMIT_REQUESTS", "30"))
 RATE_LIMIT_WINDOW_SECONDS = int(os.getenv("RATE_LIMIT_WINDOW_SECONDS", "60"))
 ADMIN_TOKEN = os.getenv("ADMIN_TOKEN", "")
+CLEAR_CACHE_ON_STARTUP = os.getenv("CLEAR_CACHE_ON_STARTUP", "false").lower() in {"1", "true", "yes"}
 
 NOMINATIM_URL = "https://nominatim.openstreetmap.org/search"
 USER_AGENT = "RecantoFeijoada_Logistics_v10"

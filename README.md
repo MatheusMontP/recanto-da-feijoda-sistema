@@ -60,6 +60,7 @@ Variaveis de ambiente suportadas:
 | `RATE_LIMIT_REQUESTS` | `30` | Maximo de requisicoes por IP + endpoint. |
 | `RATE_LIMIT_WINDOW_SECONDS` | `60` | Janela do rate limit em segundos. |
 | `ADMIN_TOKEN` | vazio | Token obrigatorio para endpoints administrativos em producao. |
+| `CLEAR_CACHE_ON_STARTUP` | `false` | Use `true` temporariamente para limpar o cache quando o app iniciar. |
 
 ## API
 
@@ -73,6 +74,15 @@ Principais endpoints:
 | `POST` | `/api/admin/cache/clear` | Limpa o cache SQLite e o cache em memoria. Requer header `X-Admin-Token`. |
 
 ## Limpar cache em producao no Render
+
+Opcao sem Shell:
+
+1. No Render, abra o servico da API e adicione `CLEAR_CACHE_ON_STARTUP=true`.
+2. Faca deploy ou restart do servico.
+3. Depois que ficar Live, remova a variavel ou altere para `false`.
+4. Faca deploy ou restart de novo para voltar ao comportamento normal.
+
+Opcao via endpoint:
 
 1. No Render, abra o servico da API e adicione a variavel de ambiente `ADMIN_TOKEN` com um valor secreto.
 2. Faca deploy da versao com este endpoint.
