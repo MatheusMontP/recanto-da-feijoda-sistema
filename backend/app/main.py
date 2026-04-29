@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
 
-from .api.endpoints import delivery
+from .api.endpoints import admin, delivery
 from .core.config import CORS_ORIGINS, FRONTEND_DIR
 from .core.errors import http_exception_handler, unhandled_exception_handler, validation_exception_handler
 from .db.cache import init_db
@@ -38,6 +38,7 @@ app.add_exception_handler(Exception, unhandled_exception_handler)
 
 # Include Routers
 app.include_router(delivery.router, prefix="/api")
+app.include_router(admin.router, prefix="/api")
 
 @app.get("/", include_in_schema=False)
 def root_redirect():

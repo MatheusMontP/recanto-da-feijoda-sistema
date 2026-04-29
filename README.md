@@ -59,6 +59,7 @@ Variaveis de ambiente suportadas:
 | `CORS_ORIGINS` | `*` em dev | Lista separada por virgula, exemplo `https://seudominio.com,http://localhost:8000`. |
 | `RATE_LIMIT_REQUESTS` | `30` | Maximo de requisicoes por IP + endpoint. |
 | `RATE_LIMIT_WINDOW_SECONDS` | `60` | Janela do rate limit em segundos. |
+| `ADMIN_TOKEN` | vazio | Token obrigatorio para endpoints administrativos em producao. |
 
 ## API
 
@@ -69,6 +70,25 @@ Principais endpoints:
 | `POST` | `/api/optimize_route` | Otimiza uma lista de entregas e retorna JSON completo. |
 | `POST` | `/api/optimize_route_stream` | Otimiza com progresso em NDJSON. Usado pelo frontend. |
 | `POST` | `/api/sync_google_distance` | Consulta distancia no Google Maps quando disponivel. |
+| `POST` | `/api/admin/cache/clear` | Limpa o cache SQLite e o cache em memoria. Requer header `X-Admin-Token`. |
+
+## Limpar cache em producao no Render
+
+1. No Render, abra o servico da API e adicione a variavel de ambiente `ADMIN_TOKEN` com um valor secreto.
+2. Faca deploy da versao com este endpoint.
+3. Chame uma vez:
+
+```powershell
+Invoke-RestMethod -Method Post `
+  -Uri "https://SEU-SERVICO.onrender.com/api/admin/cache/clear" `
+  -Headers @{ "X-Admin-Token" = "SEU_TOKEN" }
+```
+
+Resposta esperada:
+
+```json
+{"status":"ok","deleted_rows":0,"memory_entries":0}
+```
 
 Formato padrao de erro:
 

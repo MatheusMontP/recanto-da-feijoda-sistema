@@ -49,6 +49,17 @@ def reset_cache_counters():
         _cache_counters[key] = 0
 
 
+def clear_geocode_cache() -> dict[str, int]:
+    with closing(sqlite3.connect(CACHE_DB)) as conn:
+        _ensure_schema(conn)
+        deleted = conn.execute("DELETE FROM geocache").rowcount
+        conn.commit()
+    memory_entries = len(_geocode_cache)
+    _geocode_cache.clear()
+    reset_cache_counters()
+    return {"deleted_rows": deleted, "memory_entries": memory_entries}
+
+
 def _log_cache_event(event: str, key: str, query: str, status: str, elapsed_ms: float):
     logger.debug(
         "geocode_cache_event event=%s key_hash=%s original_query_len=%d status=%s elapsed_ms=%.2f",

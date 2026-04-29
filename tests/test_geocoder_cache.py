@@ -56,6 +56,24 @@ class GeocoderCacheTests(unittest.TestCase):
             self.assertEqual(cached, positive)
         Path(db_path).unlink(missing_ok=True)
 
+    def test_clear_geocode_cache_removes_sqlite_and_memory_entries(self):
+        db_path = _test_db_path()
+        with patch.object(cache, "CACHE_DB", db_path):
+            cache._geocode_cache.clear()
+            cache.set_cached_geocode(
+                "Rua Cache, Aracaju - SE",
+                {"lat": -10.0, "lon": -37.0, "display_name": "Aracaju, Sergipe"},
+            )
+
+            result = cache.clear_geocode_cache()
+            cached, exists = cache.get_cached_geocode("Rua Cache")
+
+            self.assertEqual(result["deleted_rows"], 1)
+            self.assertEqual(result["memory_entries"], 1)
+            self.assertFalse(exists)
+            self.assertIsNone(cached)
+        Path(db_path).unlink(missing_ok=True)
+
 
 class GeocoderCacheAsyncTests(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
